@@ -44,33 +44,46 @@
       value: segatoolsText,
       theme: "vs-dark"
     });
-    
+    let decorations = editor.createDecorationsCollection([])
+
     function updateErrorList() {
       errors = troubleshootSegatools(editor.getValue());
+
+      decorations.set(errors
+        .filter(v => v.line && v.type != "success")
+        .map(v => {
+          return {
+            range: new monaco.Range((v.line ?? 0) + 1, 1, (v.line ?? 0) + 1, 1),
+            options: {
+              isWholeLine: true,
+              linesDecorationsClassName: `editor-${v.type}`,
+            }
+          }
+        })
+      );
     }; updateErrorList();
     editor.getModel()?.onDidChangeContent(updateErrorList);
   });
 </script>
 <div class="container">
   <h1>
-    incompetence
+    segatools verbose
+    <div class="subtext">
+      chicken butt
+    </div>
   </h1>
 
-  Welcome. You are probably here because you are having troubles with setting up CHUNITHM.<br>
-  If you haven't already, select the highest folder that can contain your data. This should be above your option folder.
   <p>
-    <button>Select App folder</button>
+    Welcome. You are probably here because you are having troubles with setting up <i>CHUNITHM</i>.<br>
+    If you haven't already, select the highest folder that can contain your data. This should be above your option folder.
   </p>
 
+  <div class="code-container" bind:this={editorContainer}></div>
   <div class="message-list">
     {#each errors as error}
       <div class={`message ${error.type}`}>
-        {error.description}
+        {error.description} {error.line ? `(Line ${error.line})` : ""}
       </div>
     {/each}
-  </div>
-
-  <div class="code-container" bind:this={editorContainer}>
-
   </div>
 </div>

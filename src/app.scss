@@ -14,20 +14,42 @@ button {
     border: none;
 }
 
-.container {
-    // TODO: clean up styles
-    width: 800px;
-    height: 95%;
-    padding: 2.5%;
+h1 {
+    margin: 0;
+    position: relative;
+    width: fit-content;
 
-    position: fixed;
+    .subtext {
+        position: absolute;
+        bottom: 0%;
+        transform: translate(-100%, 50%);
+        left: 100%;
+        font-size: 0.5em;
+        width: 100%;
+        text-align: right;
+        color: #7a7b8f;
+    }
+}
+
+.container {
+    width: 800px;
+    margin: 0.5em;
+
+    position: absolute;
     top: 0;
     left: 50%;
     transform: translate(-50%, 0);
 }
+@media (max-width: 800px) {
+    .container {
+        width: calc(100% - 1em);
+        transform: none;
+        left: 0;
+    }
+}
 
 .code-container {
-    height: 50%;
+    aspect-ratio: 2;
     width: 100%;
 }
 
@@ -64,5 +86,37 @@ button {
             margin-right: 1em;
             color: var(--color);
         }
+    }
+}
+
+.editor-warning,
+.editor-error {
+    width: 5px !important;
+    margin-left: 5px !important;
+    
+    &.editor-error {
+        background: #e250507f;
+    }
+    &.editor-warning {
+        background:#f1d66a7f;
+    }
+}
+
+.modal-container {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #0006;
+
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 1em;
+        background: #17161d;
+        border-radius: 0.5em;
     }
 }
