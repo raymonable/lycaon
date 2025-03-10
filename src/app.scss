@@ -1,0 +1,68 @@
+@use "@fontsource/zen-kaku-gothic-new";
+
+body {
+    font-family: "Zen Kaku Gothic New";
+
+    background: #17161d;
+    color: #ffffff;
+}
+button {
+    color: #ffffff;
+    background: #664c85;
+    padding: 0.5em 1em;
+    border-radius: 0.75em;
+    border: none;
+}
+
+.container {
+    // TODO: clean up styles
+    width: 800px;
+    height: 95%;
+    padding: 2.5%;
+
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.code-container {
+    height: 50%;
+    width: 100%;
+}
+
+.message-list {
+    display: flex;
+    flex-direction: column;
+    
+    .message {
+        &.severe,
+        &.error {
+            --color: #e25050;
+            &::before {
+                content: "✕";
+            }
+        }
+        &.warning {
+            --color: #f1d66a;
+            &::before {
+                content: "!";
+            }
+        }
+        &.success {
+            --color: #62b67e;
+            &::before {
+                content: "✓";
+            }
+        }
+
+        padding: 0.5em 1em;
+        background: #1e1b26;
+        border-left: solid 0.25em var(--color);
+
+        &::before {
+            margin-right: 1em;
+            color: var(--color);
+        }
+    }
+}
