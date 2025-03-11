@@ -6,6 +6,7 @@ export default {
         let enable = entries["keychip"]["enable"];
         if (typeof(enable) == "boolean" && enable) {
             let id = entries["keychip"]["id"] as string;
+            if (!id) return;
             if (id.length != 16 || id.at(4) != "-")
                 return {
                     type: "error", description: "Keychip is formatted incorrectly."

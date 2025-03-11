@@ -2,8 +2,20 @@ import { type SegatoolsProblem, type SegatoolsResponse } from "../../segatools";
 
 export default {
     match(entries: Record<string, Record<string, string | number | boolean>>): undefined | SegatoolsResponse {
-        if (!entries["slider"] || !entries["chuniio"]) return;
+        if (!entries["slider"]) return;
         let enable = entries["slider"]["enable"];
+        if (enable) {
+            let cells = Object.keys(entries["slider"])
+                .filter(v => v.substring(0, 4) == "cell" && entries["slider"][v])
+                .length;
+            if (cells != 32)
+                return {
+                    type: "warning",
+                    description: `You have ${cells} slider cells set out of 32 (cell1 to cell32).`
+                }
+        }
+
+        if (!entries["chuniio"]) return;
         
         let path = entries["chuniio"]["path"];
         let path32 = entries["chuniio"]["path32"];
