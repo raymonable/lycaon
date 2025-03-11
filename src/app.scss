@@ -10,7 +10,9 @@ button {
     color: #ffffff;
     background: #664c85;
     padding: 0.5em 1em;
-    border-radius: 0.75em;
+    border-radius: 0.25em;
+    font-family: "Zen Kaku Gothic New";
+    font-weight: medium;
     border: none;
 }
 
@@ -18,6 +20,9 @@ h1 {
     margin: 0;
     position: relative;
     width: fit-content;
+
+    font-weight: bolder;
+    letter-spacing: 0.425em;
 
     .subtext {
         position: absolute;
@@ -28,12 +33,14 @@ h1 {
         width: 100%;
         text-align: right;
         color: #7a7b8f;
+        letter-spacing: 0;
+        font-weight: normal;
     }
 }
 
 .container {
     width: 800px;
-    margin: 0.5em;
+    margin: 1em;
 
     position: absolute;
     top: 0;
@@ -42,14 +49,14 @@ h1 {
 }
 @media (max-width: 800px) {
     .container {
-        width: calc(100% - 1em);
+        width: calc(100% - 2em);
         transform: none;
         left: 0;
     }
 }
 
 .code-container {
-    aspect-ratio: 2;
+    aspect-ratio: 4/3;
     width: 100%;
 }
 

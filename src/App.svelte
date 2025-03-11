@@ -67,15 +67,20 @@
 </script>
 <div class="container">
   <h1>
-    segatools verbose
+    deficithm 
     <div class="subtext">
-      chicken butt
+      segatools editor for チュウニズム
     </div>
   </h1>
 
   <p>
-    Welcome. You are probably here because you are having troubles with setting up <i>CHUNITHM</i>.<br>
-    If you haven't already, select the highest folder that can contain your data. This should be above your option folder.
+    <i>This tool is experimental. Take all information with discretion.</i><br>
+    Do <strong>NOT</strong> share your segatools.ini with people you do not trust, as it contains your keychip.
+  </p>
+  <p>
+    <!-- TODO: functionality -->
+    <button>Select App folder</button>
+    <button>Select segatools.ini (Limited functionality)</button>
   </p>
 
   <div class="code-container" bind:this={editorContainer}></div>
@@ -86,4 +91,10 @@
       </div>
     {/each}
   </div>
+
+  <p>
+    <!-- TODO: functionality -->
+    <!-- If using Segatools-only mode, add a button to download -->
+    <button>Generate troubleshooting package</button>
+  </p>
 </div>
