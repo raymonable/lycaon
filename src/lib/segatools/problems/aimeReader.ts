@@ -1,7 +1,7 @@
 import { type SegatoolsProblem, type SegatoolsResponse } from "../../segatools";
 
 export default {
-    match(entries: Record<string, Record<string, string | number | boolean>>): undefined | SegatoolsResponse {
+    async match(entries: Record<string, Record<string, string | number | boolean>>): Promise<undefined | SegatoolsResponse> {
         if (!entries["aime"]) return;
         let enable = entries["aime"]["enable"];
         if (typeof (enable) == "boolean" && !enable)

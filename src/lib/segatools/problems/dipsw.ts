@@ -1,7 +1,7 @@
 import { type SegatoolsProblem, type SegatoolsResponse } from "../../segatools";
 
 export default {
-    match(entries: Record<string, Record<string, string | number | boolean>>): undefined | SegatoolsResponse {
+    async match(entries: Record<string, Record<string, string | number | boolean>>): Promise<undefined | SegatoolsResponse> {
         if (!entries["system"]) return;
         let dipsw2 = entries["system"]["dipsw2"];
         let dipsw3 = entries["system"]["dipsw3"];

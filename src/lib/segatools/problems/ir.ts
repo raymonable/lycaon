@@ -1,8 +1,7 @@
 import { type SegatoolsProblem, type SegatoolsResponse } from "../../segatools";
 
 export default {
-    match(entries: Record<string, Record<string, string | number | boolean>>): undefined | SegatoolsResponse {
-        if (!entries["ir"] || !entries["io3"]) return;
+    async match(entries: Record<string, Record<string, string | number | boolean>>): Promise<undefined | SegatoolsResponse> {    if (!entries["ir"] || !entries["io3"]) return;
         let irs = Object.keys(entries["ir"]).filter(v => entries["ir"][v]).length;
         if (irs != 6)
             return {

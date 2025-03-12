@@ -8,7 +8,7 @@ export interface SegatoolsResponse {
 };
 export type Segatools = Record<string, Record<string, number | string | boolean>>
 export interface SegatoolsProblem {
-    match: (entries: Record<string, Record<string, number | string | boolean>>) => undefined | SegatoolsResponse // Try to return a response whenever possible.
+    match: (entries: Record<string, Record<string, number | string | boolean>>) => Promise<undefined | SegatoolsResponse> // Try to return a response whenever possible.
 };
 
 const sectionRegex = /^[\[\]].*?$/;
@@ -131,11 +131,12 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
         })
     }
 
-    problems.forEach(problem => {
-        let match = problem.match(segatools);
+    for (let idx = 0; problems.length > idx; idx++) {
+        let problem = problems[idx];
+        let match = await problem.match(segatools);
         if (match)
-            responses.push(match);   
-    })
+            responses.push(match);
+    }
 
     // this is ugly
     if (segatools["vfs"]["option"] && binPath) {

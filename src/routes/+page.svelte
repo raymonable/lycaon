@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { troubleshootSegatools, type SegatoolsProblem, type SegatoolsResponse } from "./lib/segatools";
-  import Editor from "./lib/editor.svelte";
-  import { drop } from "./lib/segatools/fs";
+  import { troubleshootSegatools, type SegatoolsProblem, type SegatoolsResponse } from "$lib/segatools";
+  
+  import { drop } from "$lib/segatools/fs";
+  import Editor from "$lib/editor.svelte";
 
   type SegatoolsState = "drop" | "success";
 

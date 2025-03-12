@@ -1,11 +1,6 @@
 import { type SegatoolsProblem, type SegatoolsResponse } from "../../segatools";
 import levenshtein from "js-levenshtein";
 
-/* Please help fill in this table! */
-export const dns: Record<string, string> = {
-    "aquadx.hydev.org": "AquaDX",
-};
-
 function isIpAddress(address: string): boolean {
     // Not accounting for IPV6 because IPV6 is wrong.
     let addr = address.split(".");
@@ -14,23 +9,22 @@ function isIpAddress(address: string): boolean {
 function isDomain(address: string): boolean {
     return address.split(".").length >= 2;
 };
-function detectPossibleTypo(address: string): string | undefined {
-    return Object.keys(dns).find(v => {
-        let distance = levenshtein(address, v)
-        return distance <= 2 && distance != 0;
-    });
+let dnsResponseCache: Record<string, SegatoolsResponse> = {};
+async function getDnsInformation(address: string): Promise<SegatoolsResponse> { 
+    if (dnsResponseCache[address]) return dnsResponseCache[address];
+    let response = await fetch(`/api/dns/verify?address=${address}`, {
+        headers: {
+            "Content-Type": "application/json"
+        },
+    }).then(r => r.json()) as SegatoolsResponse;
+    dnsResponseCache[address] = response;
+    return response;
 }
 
 export default {
-    match(entries: Record<string, Record<string, string | number | boolean>>): undefined | SegatoolsResponse {
+    async match(entries: Record<string, Record<string, string | number | boolean>>): Promise<undefined | SegatoolsResponse> {
         if (!entries["dns"]) return;
         let address = entries["dns"]["default"] as string;
-
-        let possibleTypo = detectPossibleTypo(address);
-        if (possibleTypo)
-            return {
-                type: "warning", description: `Possible typo in DNS, did you mean ${possibleTypo}? (${address})`
-            }
 
         if (address == "127.0.0.1" || !address)
             return {
@@ -41,8 +35,6 @@ export default {
                     type: "success", description: `Your ALL.net server is set to ${address}`
                 }
             } else if (isDomain(address))
-                return {
-                    type: "success", description: `Your ALL.net server is set to ${dns[address] ? `${dns[address]} (${address})` : `${address}`}`
-                }
+                return getDnsInformation(address);
     }
 } as SegatoolsProblem;

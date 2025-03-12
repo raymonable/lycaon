@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Sveltekit
+.svelte-kit/
+.svelte-kit/*
+
+# Specific files
+src/lib/config/dns.json

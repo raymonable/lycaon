@@ -1,8 +1,7 @@
 import { type SegatoolsProblem, type SegatoolsResponse } from "../../segatools";
 
 export default {
-    match(entries: Record<string, Record<string, string | number | boolean>>): undefined | SegatoolsResponse {
-        if (!entries["slider"]) return;
+    async match(entries: Record<string, Record<string, string | number | boolean>>): Promise<undefined | SegatoolsResponse> {    if (!entries["slider"]) return;
         let enable = entries["slider"]["enable"];
         if (enable) {
             let cells = Object.keys(entries["slider"])
