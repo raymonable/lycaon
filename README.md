@@ -2,8 +2,7 @@
 
 A segatools.ini editor / checker.
 
-> :exclamation: SvelteKit is used to avoid hosting DNS names on the client (and in the future, to enable poweron testing? TBD).<br>
-> Everything else is done entirely on the client.
+> :warning: Firefox and other non-Chromium based browsers is not properly supported yet as `webkitEntries` (yes, an old API, whatever) doesn't work as intended on Firefox.
 
 ## Hosting
 
