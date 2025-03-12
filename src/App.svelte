@@ -11,12 +11,13 @@
   let state: SegatoolsState = "drop";
 
   let segatoolsPath: FileSystemFileEntry | undefined;
+  let scopePath: FileSystemDirectoryEntry | undefined;
   let binPath: FileSystemDirectoryEntry | undefined;
   
   let defaultSegatoolsString: string;
 
   async function updateSegatools(data: string) {
-    responses = await troubleshootSegatools(data, binPath);
+    responses = await troubleshootSegatools(data, binPath, scopePath);
     defaultSegatoolsString = data;
   }
 
@@ -68,6 +69,7 @@
       state = "success";
     } else
       (response?.segatoolsPath as FileSystemFileEntry).file(async f => {
+        scopePath = response?.scope;
         binPath = await new Promise(r => (response?.segatoolsPath as FileSystemEntry)?.getParent(f => r(f as FileSystemDirectoryEntry)));
         segatoolsPath = response?.segatoolsPath as FileSystemFileEntry;
         
