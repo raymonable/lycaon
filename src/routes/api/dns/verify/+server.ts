@@ -22,3 +22,5 @@ export function GET({url}) {
         type: "success", description: `Your ALL.net server is set to ${dns[address] ? `${dns[address]} (${address})` : `${address}`}`
     }), {headers: {'Content-Type': 'application/json'}});
 }
+
+export const prerender = false;
