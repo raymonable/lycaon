@@ -54,7 +54,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
             if (j.match(sectionRegex)) {
                 if (j.at(0) != "[" || j.at(j.length - 1) != "]")
                     return r(responses.push({
-                        type: "error", description: "Inverse squared bracket. It should look like this: [name].", line: l
+                        type: "error", description: `${j.at(j.length - 1) == "]" ? `Inverse squared bracket` : `Unfinished or improper statement`}. It should look like this: [name].`, line: l
                     }))
                 let sectionName = j.slice(1, j.length - 1);
                 if (sectionName == "gpio")
