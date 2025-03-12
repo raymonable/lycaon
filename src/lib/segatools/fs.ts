@@ -4,7 +4,7 @@ export function isOption(name: string) {
     return name.slice(0, 1) == "A" && !isNaN(parseInt(name.slice(1))) && name.length == 4
 }
 export function isIni(fileName: string) {
-    return fileName.split(".")[fileName.split(".").length - 1];
+    return fileName.split(".")[fileName.split(".").length - 1].split(" ")[0] == "ini";
 }
 
 export interface SegatoolsFilesystemResponse {
