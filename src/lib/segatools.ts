@@ -94,7 +94,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                             
                             if (value.at(1) == ":") {
                                 responses.push({
-                                    type: "warning", description: "Avoid using absolute paths.", line: l
+                                    type: "warning", description: `Avoid using absolute paths, as I cannot verify the existence ${key}.`, line: l
                                 });
                             } else
                                 if (binPath) {

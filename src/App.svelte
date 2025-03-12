@@ -43,12 +43,16 @@
   <h1>
     deficithm 
     <div class="subtext">
-      for stupid chunithm players
+      for deficiency of common sense
     </div>
   </h1>
   <p>
     <i>This tool is experimental. Take all information with discretion.</i><br>
     Do <strong>NOT</strong> share your segatools.ini with people you do not trust, as it contains your keychip.
+  </p>
+  <p>
+    This tool is only intended for「CHUNITHM NEW!!」or newer.
+    All data is processed on the client. No data is uploaded to a server unless requested.
   </p>
   {#if (state as SegatoolsState) === "success"}
     <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
@@ -69,4 +73,7 @@
       {/each}
     </div>
   {/if}
+  <p>
+    <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game">
+  </p>
 </div>

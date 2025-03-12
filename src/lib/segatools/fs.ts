@@ -28,7 +28,7 @@ async function findSegatools(root: FileSystemEntry) {
         } else if (entry.name == "segatools.ini") {
             if (fsResponse.segatoolsPath) {
                 fsResponse.responses.push({
-                    description: `I have discovered 2 segatools.ini. You may have used a scope that is too large or have duplicates.`,
+                    description: `I have discovered 2 segatools.ini. You may have selected too large of a scope. Select a folder lower down and check for duplicates.`,
                     type: "error"
                 });
                 delete fsResponse.segatoolsPath;
