@@ -9,7 +9,7 @@ export default {
                 type: "error",
                 description: `Only ${irs} of 6 IRs are set (ir1 to ir6).`
             }
-        if (entries["io3"]["ir"])
+        if (entries["io3"]["ir"] && entries["io3"]["ir"] != 0)
             return {
                 type: "warning",
                 description: "You have IRs set manually, and also set in [io3]. [io3] will be prioritized over [ir]."

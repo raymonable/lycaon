@@ -3,10 +3,14 @@
   import Editor from "./lib/editor.svelte";
   import { drop } from "./lib/segatools/fs";
 
+  import hotkeys from "hotkeys-js";
+
   type SegatoolsState = "drop" | "success";
 
   let responses: SegatoolsResponse[] = [];
   let state: SegatoolsState = "drop";
+
+  let segatoolsPath: FileSystemFileEntry | undefined;
   let binPath: FileSystemDirectoryEntry | undefined;
   
   let defaultSegatoolsString: string;
@@ -15,6 +19,33 @@
     responses = await troubleshootSegatools(data, binPath);
     defaultSegatoolsString = data;
   }
+
+  function save() {
+    if ('showSaveFilePicker' in window) {
+      window.showSaveFilePicker({
+        types: [
+            {
+                description: "Override your segatools.ini",
+                accept: { "text/plain": [".ini"] },
+            },
+        ],
+        suggestedName: "segatools.ini"
+      }).then(async handle => {
+        const writable = await handle.createWritable();
+        await writable.write(defaultSegatoolsString);
+        await writable.close();
+      })
+    } else {
+      // due to browser limitations we just have to download it :sob:
+      let download = document.createElement("a");
+      download.href = URL.createObjectURL(new Blob([defaultSegatoolsString], {type: "text/plain"}));
+      download.download = "segatools.ini"
+      download.click();
+    }
+  };
+  hotkeys("ctrl+s,command+s", e => {
+    e.preventDefault(); save();
+  });
 
   async function safeDrop(e: Event & { currentTarget: EventTarget & HTMLInputElement; }) {
     responses = [{
@@ -32,15 +63,21 @@
       if (response?.responses.length > 0)
         return responses = response.responses;
     // fuck you legacy apis
-    (response?.segatoolsPath as FileSystemFileEntry).file(async f => {
-      binPath = await new Promise(r => response?.segatoolsPath?.getParent(f => r(f as FileSystemDirectoryEntry)));
-      await updateSegatools(await f.text());
+    if (response?.segatoolsPath instanceof File) {
+      await updateSegatools(await response.segatoolsPath.text());
       state = "success";
-    });
+    } else
+      (response?.segatoolsPath as FileSystemFileEntry).file(async f => {
+        binPath = await new Promise(r => (response?.segatoolsPath as FileSystemEntry)?.getParent(f => r(f as FileSystemDirectoryEntry)));
+        segatoolsPath = response?.segatoolsPath as FileSystemFileEntry;
+        
+        await updateSegatools(await f.text());
+        state = "success";
+      });
   }
 </script>
 <div class="container">
-  <h1>
+  <h1 translate="no">
     deficithm 
     <div class="subtext">
       for deficiency of common sense
@@ -56,6 +93,9 @@
   </p>
   {#if (state as SegatoolsState) === "success"}
     <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
+    <p>
+      <button on:click={save}>Save</button>
+    </p>
   {:else}
     <div class="drag-container">
       <div class="drag">

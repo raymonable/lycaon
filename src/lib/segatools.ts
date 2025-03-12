@@ -1,8 +1,9 @@
 import { type SegatoolsValue, expectedKeys } from "./segatools/expectedKeys";
 import { accessRelativePath, isOption } from "./segatools/fs";
 
+export type SegatoolsResponseType = "severe" | "error" | "warning" | "success" | "loading";
 export interface SegatoolsResponse {
-    type: "severe" | "error" | "warning" | "success" | "loading";
+    type: SegatoolsResponseType;
     description: string;
     line?: number;
 };
@@ -15,6 +16,14 @@ const sectionRegex = /^[\[\]].*?$/;
 const problems: SegatoolsProblem[] = 
     Object.values(import.meta.glob('./segatools/problems/*.ts', { eager: true }))
         .map(o => (o as { default: SegatoolsProblem }).default);
+
+const responseSorting: Record<SegatoolsResponseType, number> = {
+    "severe": 5,
+    "error": 4,
+    "warning": 3,
+    "success": 2,
+    "loading": 1
+}
 
 export async function troubleshootSegatools(segatoolsString: string, binPath?: FileSystemDirectoryEntry): Promise<SegatoolsResponse[]> {
     /*
@@ -161,6 +170,13 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
             }
         }
     }
+
+    if (!binPath)
+        responses.push({
+            type: "warning",
+            description: "Limited functionality is available because only segatools.ini is available. Drag and drop your folder next time."
+        })
+    responses.sort((a, b) => responseSorting[b.type] - responseSorting[a.type]);
 
     return responses;
 };

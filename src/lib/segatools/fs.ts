@@ -5,7 +5,7 @@ export function isOption(name: string) {
 }
 
 export interface SegatoolsFilesystemResponse {
-    segatoolsPath?: FileSystemEntry,
+    segatoolsPath?: FileSystemEntry | File,
     chusan?: FileSystemEntry,
     responses: SegatoolsResponse[]
 }
@@ -75,14 +75,14 @@ export async function drop(event: Event & { currentTarget: EventTarget & HTMLInp
     let input = (event.target as HTMLInputElement);
     if (!input.files) return;
 
-    if (input.webkitEntries.length > 0) {
-        // user dropped in a directory
-        return await findSegatools(input.webkitEntries[0])
-    } else if (input.files.length > 0)
-        // user selected a file
-        if (input.files[0].name == "segatools.ini") {
-            // todo lol
-            return;
+    if (input.webkitEntries.length > 0)
+        if (input.webkitEntries[0].name == "segatools.ini") {
+            return {
+                segatoolsPath: input.files[0],
+                responses: []
+            };
+        } else if (input.webkitEntries[0].isDirectory) {
+            return await findSegatools(input.webkitEntries[0]);
         } else
             throw new Error("Not a segatools.ini selected")
 };
