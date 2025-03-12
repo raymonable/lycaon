@@ -36,7 +36,7 @@ async function findSegatools(root: FileSystemEntry) {
                     type: "error"
                 });
                 delete fsResponse.segatoolsPath;
-                return;
+                return fsResponse;
             } else
                 fsResponse.segatoolsPath = entry;
         } else if (entry.name == "chusanApp.exe") {

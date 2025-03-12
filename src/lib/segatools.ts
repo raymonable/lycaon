@@ -40,8 +40,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
     */
 
     const segatools: Segatools = {};
-    const responses: SegatoolsResponse[] = [];
-
+    let responses: SegatoolsResponse[] = [];
     let activatedSections: string[] = [];
 
     let segments = segatoolsString.split("\n")
@@ -60,7 +59,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                 let sectionName = j.slice(1, j.length - 1);
                 if (sectionName == "gpio")
                     responses.push({
-                        type: "error", description: "You are using [gpio] instead of [system]. It's likely that your segatools.ini and/or segatools itself are out of date. Please update them."
+                        type: "severe", description: "You are using [gpio] instead of [system]. It's likely that your segatools.ini and/or segatools itself are out of date. Update them to continue."
                     })
                 if (!expectedKeys[sectionName])
                     return r(responses.push({
@@ -179,12 +178,19 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                     }
                 }
             } catch(e) {};
-
+            
     if (!binPath)
         responses.push({
             type: "warning",
             description: "Limited functionality is available because only segatools.ini is available. Next time, drag and drop your folder."
         })
+    if (responses.find(v => v.type == "severe")) {
+        responses = [...responses.filter(v => v.type == "severe"), {
+            type: "warning",
+            description: "All other errors have been hidden. Please resolve the above to continue."
+        }]
+    }
+
     responses.sort((a, b) => responseSorting[b.type] - responseSorting[a.type]);
 
     return responses;
