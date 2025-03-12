@@ -7,7 +7,7 @@ export default {
         if (typeof (enable) == "boolean" && !enable)
             return {
                 type: "warning",
-                description: "Aime reader emulation is disabled. If you're not using a real reader, you should enable it."
+                description: "Aime reader emulation is disabled. If you're not using a physical reader through serial, you should enable it."
             }
         return;
     }

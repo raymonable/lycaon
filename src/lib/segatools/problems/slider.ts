@@ -31,6 +31,11 @@ export default {
                 type: "error",
                 description: `You only have path${path32 ? "32" : "64"} set, you also need path${!path32 ? "32" : "64"}.`
             }
+        if (path32 && path64 && path32 == path64)
+            return {
+                type: "error",
+                description: "Your path32 and path64 should not be the same."
+            }
 
         if (typeof (enable) == "boolean" && !enable && (path64 || path32))
             return {

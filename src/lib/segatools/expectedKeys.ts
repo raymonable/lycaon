@@ -57,7 +57,7 @@ export const expectedKeys = {
         "controllerLedOutputSerial": "boolean"
     },
     aimeio: {
-        "path": "path"
+        "path": ["path"]
     },
     chuniio: {
         "path": ["path"],
