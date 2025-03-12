@@ -63,7 +63,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                     })
                 if (!expectedKeys[sectionName])
                     return r(responses.push({
-                        type: "error", description: "Unexpected section.", line: l
+                        type: "error", description: `Unexpected section [${sectionName}]`, line: l
                     }))
                 activatedSections.push(sectionName);
                 return r(true);

@@ -119,7 +119,8 @@
     <div class="message-list">
       {#each responses as response}
         <div class={`message ${response.type}`}>
-          {response.description}
+          <!-- TODO: figure out how to tell the editor component to navigate to the line -->
+          {response.description} {response.line ? `(Line ${response.line + 1})`: ``}
         </div>
       {/each}
     </div>
