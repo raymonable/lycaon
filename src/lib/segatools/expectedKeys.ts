@@ -30,11 +30,11 @@ export const expectedKeys = {
     keychip: {
         "enable": "boolean",
         "id": ["string"],
-        "subnet": ["string"], // not adding a type for ip addresses
-        "addrSuffix": ["number"]
+        "subnet": ["string"] // not adding a type for ip addresses
     },
     netenv: {
-        "enable": "boolean"
+        "enable": "boolean",
+        "addrSuffix": ["number"]
     },
     system: {
         "enable": "boolean",
