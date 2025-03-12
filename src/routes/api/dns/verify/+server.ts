@@ -1,7 +1,8 @@
 import { redirect } from "@sveltejs/kit"
 import levenshtein from "js-levenshtein";
+import { env } from "$env/dynamic/private";
 
-const dns: Record<string, string> = JSON.parse(process.env.DNS ?? "{}");
+const dns: Record<string, string> = JSON.parse(env.DNS ?? "{}");
 function detectPossibleTypo(address: string): string | undefined {
     return Object.keys(dns).find(v => {
         let distance = levenshtein(address, v)
