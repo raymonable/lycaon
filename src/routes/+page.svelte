@@ -121,5 +121,6 @@
   {/if}
   <p>
     <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game">
+    <small class="version">Version {APP_VERSION}</small>
   </p>
 </div>

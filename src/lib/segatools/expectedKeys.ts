@@ -55,7 +55,8 @@ export const expectedKeys = {
         "cabLedOutputPipe": "boolean",
         "cabLedOutputSerial": "boolean",
         "controllerLedOutputPipe": "boolean",
-        "controllerLedOutputSerial": "boolean"
+        "controllerLedOutputSerial": "boolean",
+        "controllerLedOutputOpeNITHM": ["boolean"]
     },
     aimeio: {
         "path": ["path"]

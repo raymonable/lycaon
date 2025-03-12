@@ -3,6 +3,9 @@ import type { SegatoolsResponse } from "../segatools";
 export function isOption(name: string) {
     return name.slice(0, 1) == "A" && !isNaN(parseInt(name.slice(1))) && name.length == 4
 }
+export function isIni(fileName: string) {
+    return fileName.split(".")[fileName.split(".").length - 1];
+}
 
 export interface SegatoolsFilesystemResponse {
     segatoolsPath?: FileSystemEntry | File,
@@ -82,7 +85,7 @@ export async function drop(event: Event & { currentTarget: EventTarget & HTMLInp
     if (!input.files) return;
 
     if (input.webkitEntries.length > 0) {
-        if (input.webkitEntries[0].name == "segatools.ini") {
+        if (isIni(input.files[0].name)) {
             return {
                 segatoolsPath: input.files[0],
                 responses: []
@@ -90,13 +93,23 @@ export async function drop(event: Event & { currentTarget: EventTarget & HTMLInp
         } else if (input.webkitEntries[0].isDirectory) {
             return await findSegatools(input.webkitEntries[0]);
         } else
-            throw new Error("Not a segatools.ini selected")
+            return {
+                responses: [{
+                    description: "This doesn't appear to be CHUNITHM data.",
+                    type: "error"
+                }]
+            };
     } else if (input.files.length > 0)
-        if (input.files[0].name == "segatools.ini") {
+        if (isIni(input.files[0].name)) {
             return {
                 segatoolsPath: input.files[0],
                 responses: []
             };
         } else
-            throw new Error("Not a segatools.ini selected")
+            return {
+                responses: [{
+                    description: "This doesn't appear to be CHUNITHM data.",
+                    type: "error"
+                }]
+            };
 };

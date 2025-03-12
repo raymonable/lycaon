@@ -16,6 +16,11 @@ button {
     border: none;
 }
 
+.version {
+    color: #7a7b8f;
+    margin-left: 0.5em;
+}
+
 .drag-container {
     width: calc(100% - 1em);
     aspect-ratio: 5;
