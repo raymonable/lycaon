@@ -56,14 +56,14 @@
     }]
     let response = await drop(e);
 
-    let input = (e.target as HTMLInputElement);
-    if (input.value)
-      input.value = "";
-
     responses = [];
     if (response?.responses)
-      if (response?.responses.length > 0)
+      if (response?.responses.length > 0) {
+        let input = (e.target as HTMLInputElement);
+        if (input.value)
+          input.value = "";
         return responses = response.responses;
+      }
     // fuck you legacy apis
     if (response?.segatoolsPath instanceof File) {
       await updateSegatools(await response.segatoolsPath.text());
@@ -81,7 +81,7 @@
 </script>
 <div class="container">
   <h1 translate="no">
-    <img src="/facepalm.webp"> 
+    <img src="/facepalm.webp" alt="Chuni Penguin facepalm"> 
     <div>
       dumbassithm 
       <span class="subtext">
@@ -95,8 +95,13 @@
   </p>
   <p>
     This tool is only intended for「CHUNITHM NEW!!」or newer.
-    All data is processed on the client. No data is uploaded to a server unless requested.
+    All data (besides DNS verification) is processed on the client. 
   </p>
+  {#if !navigator.userAgent.includes("Chrome")}
+  <p>
+    <b>You are on a non-Chromium browser. You will experience issues. Please switch to a Chromium-based browser.</b>
+  </p>
+  {/if}
   {#if (state as SegatoolsState) === "success"}
     <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
     <p>
@@ -120,7 +125,7 @@
     </div>
   {/if}
   <p>
-    <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game">
-    <small class="version">Version {APP_VERSION}</small>
+    <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game"><br>
+    <small class="version">Version {APP_VERSION}. <a href="https://github.com/raymonable/lycaon">Source code</a></small>
   </p>
 </div>

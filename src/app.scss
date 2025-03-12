@@ -17,8 +17,16 @@ button {
 }
 
 .version {
-    color: #fff3;
     margin-left: 0.5em;
+    &, a {
+        color: #fff3;
+        text-decoration: none;
+        transition: 0.25s color;
+    }
+    a:hover {
+        color: #fff6;
+    }
+    
 }
 
 .drag-container {
@@ -86,18 +94,18 @@ h1 {
 
 .container {
     width: 800px;
-    margin: 1em;
+    margin: 1em 0;
 
     position: absolute;
     top: 0;
     left: 50%;
     transform: translate(-50%, 0);
 }
-@media (max-width: 800px) {
+@media (max-width: 900px) {
     .container {
         width: calc(100% - 2em);
         transform: none;
-        left: 0;
+        left: 1em;
     }
 }
 
