@@ -24,8 +24,8 @@ dist-ssr
 *.sw?
 
 # Sveltekit
-.svelte-kit/
 .svelte-kit/*
+.wrangler/*
 
 # Specific files
 src/lib/config/dns.json
