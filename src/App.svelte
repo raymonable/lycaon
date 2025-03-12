@@ -1,101 +1,72 @@
 <script lang="ts">
   import { troubleshootSegatools, type SegatoolsProblem, type SegatoolsResponse } from "./lib/segatools";
+  import Editor from "./lib/editor.svelte";
+  import { drop } from "./lib/segatools/fs";
 
-  import * as monaco from "monaco-editor";
-  import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
-  import { onMount } from "svelte";
+  type SegatoolsState = "drop" | "success";
 
-  let editorContainer: HTMLDivElement | undefined;
-  let errors: SegatoolsResponse[] = $state([]);
+  let responses: SegatoolsResponse[] = [];
+  let state: SegatoolsState = "drop";
+  let binPath: FileSystemDirectoryEntry | undefined;
   
-  onMount(async () => {
-    if (!editorContainer) return;
-    self.MonacoEnvironment = {
-      getWorker: function(_: any, label: string) {
-        return new editorWorker();
-      }
-    }
-    const segatoolsText = await fetch("/segatools.ini").then(t => t.text());
-    monaco.languages.register({ id: 'ini' });
-    // Define the syntax highlighting and structure
-    monaco.languages.setMonarchTokensProvider('ini', {
-      tokenizer: {
-        root: [
-          // **Section headers**: [SectionName]
-          [/^\s*\[.*?\]\s*$/, 'keyword'],
+  let defaultSegatoolsString: string;
 
-          // **Full-line comments** (starting with `;`)
-          [/^\s*;.*$/, 'comment'],
+  async function updateSegatools(data: string) {
+    responses = await troubleshootSegatools(data, binPath);
+    defaultSegatoolsString = data;
+  }
 
-          // **Key-value pairs**
-          [
-            /^(\s*[\w.-]+)(\s*=\s*)([^;]*)/,
-            ['variable', 'operator', 'string'],
-          ],
+  async function safeDrop(e: Event & { currentTarget: EventTarget & HTMLInputElement; }) {
+    responses = [{
+      description: "Processing. Please wait a moment.",
+      type: "loading"
+    }]
+    let response = await drop(e);
 
-          // **Inline comments** (after a value)
-          [/;.*$/, 'comment'],
-        ],
-      },
+    let input = (e.target as HTMLInputElement);
+    if (input.value)
+      input.value = "";
+
+    responses = [];
+    if (response?.responses)
+      if (response?.responses.length > 0)
+        return responses = response.responses;
+    // fuck you legacy apis
+    (response?.segatoolsPath as FileSystemFileEntry).file(async f => {
+      binPath = await new Promise(r => response?.segatoolsPath?.getParent(f => r(f as FileSystemDirectoryEntry)));
+      await updateSegatools(await f.text());
+      state = "success";
     });
-    let editor = monaco.editor.create(editorContainer, {
-      automaticLayout: true,
-      language: "ini",
-      value: segatoolsText,
-      theme: "vs-dark"
-    });
-    let decorations = editor.createDecorationsCollection([])
-
-    function updateErrorList() {
-      errors = troubleshootSegatools(editor.getValue());
-
-      decorations.set(errors
-        .filter(v => v.line && v.type != "success")
-        .map(v => {
-          return {
-            range: new monaco.Range((v.line ?? 0) + 1, 1, (v.line ?? 0) + 1, 1),
-            options: {
-              isWholeLine: true,
-              linesDecorationsClassName: `editor-${v.type}`,
-              hoverMessage: {value: v.description}
-            }
-          }
-        })
-      );
-    }; updateErrorList();
-    editor.getModel()?.onDidChangeContent(updateErrorList);
-  });
+  }
 </script>
 <div class="container">
   <h1>
     deficithm 
     <div class="subtext">
-      segatools editor for チュウニズム
+      for stupid chunithm players
     </div>
   </h1>
-
   <p>
     <i>This tool is experimental. Take all information with discretion.</i><br>
     Do <strong>NOT</strong> share your segatools.ini with people you do not trust, as it contains your keychip.
   </p>
-  <p>
-    <!-- TODO: functionality -->
-    <button>Select App folder</button>
-    <button>Select segatools.ini (Limited functionality)</button>
-  </p>
-
-  <div class="code-container" bind:this={editorContainer}></div>
-  <div class="message-list">
-    {#each errors as error}
-      <div class={`message ${error.type}`}>
-        {error.description} {error.line ? `(Line ${error.line})` : ""}
+  {#if (state as SegatoolsState) === "success"}
+    <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
+  {:else}
+    <div class="drag-container">
+      <div class="drag">
+        <input type="file" on:input={safeDrop}>
       </div>
-    {/each}
-  </div>
-
-  <p>
-    <!-- TODO: functionality -->
-    <!-- If using Segatools-only mode, add a button to download -->
-    <button>Generate troubleshooting package</button>
-  </p>
+    </div>
+  {/if}
+  {#if responses.length > 0}
+    <h2>Feedback</h2>
+    <div class="message-list">
+      {#each responses as response}
+        <div class={`message ${response.type}`}>
+          {response.description}
+        </div>
+      {/each}
+    </div>
+  {/if}
 </div>

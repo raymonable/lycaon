@@ -16,6 +16,44 @@ button {
     border: none;
 }
 
+.drag-container {
+    width: calc(100% - 1em);
+    aspect-ratio: 5;
+    margin: 0.5em;
+    background: #0002;
+    border-radius: 0.5em;
+
+    .drag {
+        width: calc(100% - 2em);
+        height: calc(100% - 2em);
+        
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        box-shadow: 0 0 0 1px #fff3;
+        border-radius: 0.5em;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+
+        &::before {
+            content: "Drag & drop your game folder or click to select segatools.ini";
+            color: #fff3;
+        }
+
+        input {
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            position: absolute;
+        }
+    }
+}
+
 h1 {
     margin: 0;
     position: relative;
@@ -55,8 +93,8 @@ h1 {
     }
 }
 
-.code-container {
-    aspect-ratio: 4/3;
+.source-container {
+    aspect-ratio: 5/3;
     width: 100%;
 }
 
@@ -84,6 +122,12 @@ h1 {
                 content: "✓";
             }
         }
+        &.loading {
+            --color: #aaa;
+            &::before {
+                content: "..."
+            }
+        }
 
         padding: 0.5em 1em;
         background: #1e1b26;
@@ -106,24 +150,5 @@ h1 {
     }
     &.editor-warning {
         background:#f1d66a7f;
-    }
-}
-
-.modal-container {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: #0006;
-
-    .modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 1em;
-        background: #17161d;
-        border-radius: 0.5em;
     }
 }

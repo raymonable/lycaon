@@ -1,7 +1,8 @@
 import { type SegatoolsValue, expectedKeys } from "./segatools/expectedKeys";
+import { accessRelativePath, isOption } from "./segatools/fs";
 
 export interface SegatoolsResponse {
-    type: "severe" | "error" | "warning" | "success";
+    type: "severe" | "error" | "warning" | "success" | "loading";
     description: string;
     line?: number;
 };
@@ -15,7 +16,7 @@ const problems: SegatoolsProblem[] =
     Object.values(import.meta.glob('./segatools/problems/*.ts', { eager: true }))
         .map(o => (o as { default: SegatoolsProblem }).default);
 
-export function troubleshootSegatools(segatoolsString: string): SegatoolsResponse[] {
+export async function troubleshootSegatools(segatoolsString: string, binPath?: FileSystemDirectoryEntry): Promise<SegatoolsResponse[]> {
     /*
     
     Parsing an ini file is easy, right?
@@ -23,7 +24,9 @@ export function troubleshootSegatools(segatoolsString: string): SegatoolsRespons
     Do NOT take any shortcuts.
 
     Step 1. Extract keys and values, while checking for syntax errors.
+        - ... also check paths.
     Step 2. Look for specific issues.
+    Step 3. Check options.
     
     */
 
@@ -32,35 +35,39 @@ export function troubleshootSegatools(segatoolsString: string): SegatoolsRespons
 
     let activatedSections: string[] = [];
 
-    segatoolsString.split("\n")
+    let segments = segatoolsString.split("\n")
         .map(l => l.split(/[\r;]/g)[0]) // Strip away any comments
-        .forEach((j, l) => {
-            if (!j) return;
+
+    for (let l = 0; segments.length > l; l++) {
+        // this is a little jank because it wasn't initially built around promises, sorry
+        await new Promise(async (r) => {
+            let j = segments[l];
+            if (!j) return r(true);
             if (j.match(sectionRegex)) {
                 if (j.at(0) != "[" || j.at(j.length - 1) != "]")
-                    return responses.push({
+                    return r(responses.push({
                         type: "error", description: "Inverse squared bracket. It should look like this: [name].", line: l
-                    })
+                    }))
                 let sectionName = j.slice(1, j.length - 1);
                 if (sectionName == "gpio")
-                    return responses.push({
-                        type: "severe", description: "You are using [gpio] instead of [system]. It's likely that your segatools.ini and/or segatools itself are out of date. Please update them."
+                    responses.push({
+                        type: "error", description: "You are using [gpio] instead of [system]. It's likely that your segatools.ini and/or segatools itself are out of date. Please update them."
                     })
                 if (!expectedKeys[sectionName])
-                    return responses.push({
-                        type: "severe", description: "Unexpected section.", line: l
-                    })
+                    return r(responses.push({
+                        type: "error", description: "Unexpected section.", line: l
+                    }))
                 activatedSections.push(sectionName);
-                return;
+                return r(true);
             };
             if (j.split("=").length <= 1)
-                return responses.push({
+                return r(responses.push({
                     type: "error", description: "Only key is set, no value (missing equal sign).", line: l
-                })
+                }))
             if (activatedSections.length <= 0)
-                return responses.push({
+                return r(responses.push({
                     type: "error", description: "Section is not set.", line: l
-                })
+                }))
 
             let key = j.split("=")[0];
             let value: string | number | boolean = j.split("=")[1];
@@ -84,10 +91,19 @@ export function troubleshootSegatools(segatoolsString: string): SegatoolsRespons
                             break;
                         case "path":
                             // TODO: take in the user's path data. For now, partially stub.
-                            if (value.at(1) == ":")
+                            
+                            if (value.at(1) == ":") {
                                 responses.push({
                                     type: "warning", description: "Avoid using absolute paths.", line: l
                                 });
+                            } else
+                                if (binPath) {
+                                    let path = await accessRelativePath(binPath, value ?? "");
+                                    if ((!path || !value) && !isOptional || (isOptional && !path && value))
+                                        responses.push({
+                                            type: "error", description: `Unable to locate ${value}`, line: l
+                                        })
+                                }
                             break;
                         case "keycode":
                             // Nothing much to do here! Maybe in the future we can check if it's really a byte within 0-255 range?
@@ -104,19 +120,47 @@ export function troubleshootSegatools(segatoolsString: string): SegatoolsRespons
                         segatools[section] = {};
                     segatools[section][key] = value;
                 } else
-                    return responses.push({
+                    return r(responses.push({
                         type: "warning", description: `"${key}" (in [${section}]) doesn't exist or you may have made a typo. It will be ignored in analysis.`, line: l
-                    })
+                    }))
             } else
-                return responses.push({
+                return r(responses.push({
                     type: "error", description: "Invalid section.", line: l
-                })
-        });
+                }))
+            r(true);
+        })
+    }
 
     problems.forEach(problem => {
         let match = problem.match(segatools);
         if (match)
             responses.push(match);   
     })
+
+    // this is ugly
+    if (segatools["vfs"]["option"] && binPath) {
+        let file = await accessRelativePath(binPath, segatools["vfs"]["option"] as string) as FileSystemDirectoryEntry | undefined;
+        if (file) {
+            // check options
+            let options: FileSystemEntry[] = await new Promise(r => (file as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
+            if (options.length <= 0)
+                responses.push({
+                    type: "error",
+                    description: "You have no options! Are you fucking stupid? Get some damn options!"
+                })
+            for (let idx = 0; options.length > idx; idx++) {
+                let option = options[idx];
+                if (isOption(option.name) && option.isDirectory) {
+                    let children: FileSystemEntry[] = await new Promise(r => (option as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
+                    if (children.find(child => isOption(child.name)))
+                        responses.push({
+                            type: "error",
+                            description: `Option ${option.name} contains an unnecessary child folder.`
+                        })
+                }
+            }
+        }
+    }
+
     return responses;
 };
