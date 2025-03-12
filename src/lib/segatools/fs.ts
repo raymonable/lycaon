@@ -5,8 +5,9 @@ export function isOption(name: string) {
 }
 
 export interface SegatoolsFilesystemResponse {
-    segatoolsPath?: FileSystemEntry,
+    segatoolsPath?: FileSystemEntry | File,
     chusan?: FileSystemEntry,
+    scope?: FileSystemDirectoryEntry,
     responses: SegatoolsResponse[]
 }
 
@@ -50,19 +51,24 @@ async function findSegatools(root: FileSystemEntry) {
             description: "This doesn't appear to be CHUNITHM data.",
             type: "error"
         })
+    fsResponse.scope = root as FileSystemDirectoryEntry;
     return fsResponse;
 }
 
-export async function accessRelativePath(root: FileSystemDirectoryEntry, path: string): Promise<FileSystemEntry | undefined> {
+export async function accessRelativePath(root: FileSystemDirectoryEntry, path: string, scope?: FileSystemDirectoryEntry): Promise<FileSystemEntry | undefined> {
     let base: FileSystemEntry | undefined = root;
     let segments = path.split(/[/\\]/g);
     
     for (let idx = 0; segments.length > idx; idx++) {
         let segment = segments[idx];
-        if (segment != "." && base) {
+        if (segment != "." && segment != ".." && base) {
             let files: FileSystemEntry[] = await new Promise(r => (base as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
             let file = files.find(v => v.name == segment);
             base = file;
+        } else if (segment == ".." && base) {
+            if (base.fullPath == scope?.fullPath)
+                throw new Error("Pathing too high. Increase the scope (by dragging your App folder entirely, not your bin folder)")
+            base = await new Promise((r, j) => base?.getParent(f => r(f), e => j(e)));
         } else if (segment == ".")
             base = root;
     }
@@ -75,14 +81,14 @@ export async function drop(event: Event & { currentTarget: EventTarget & HTMLInp
     let input = (event.target as HTMLInputElement);
     if (!input.files) return;
 
-    if (input.webkitEntries.length > 0) {
-        // user dropped in a directory
-        return await findSegatools(input.webkitEntries[0])
-    } else if (input.files.length > 0)
-        // user selected a file
-        if (input.files[0].name == "segatools.ini") {
-            // todo lol
-            return;
+    if (input.webkitEntries.length > 0)
+        if (input.webkitEntries[0].name == "segatools.ini") {
+            return {
+                segatoolsPath: input.files[0],
+                responses: []
+            };
+        } else if (input.webkitEntries[0].isDirectory) {
+            return await findSegatools(input.webkitEntries[0]);
         } else
             throw new Error("Not a segatools.ini selected")
 };

@@ -1,8 +1,9 @@
 import { type SegatoolsValue, expectedKeys } from "./segatools/expectedKeys";
 import { accessRelativePath, isOption } from "./segatools/fs";
 
+export type SegatoolsResponseType = "severe" | "error" | "warning" | "success" | "loading";
 export interface SegatoolsResponse {
-    type: "severe" | "error" | "warning" | "success" | "loading";
+    type: SegatoolsResponseType;
     description: string;
     line?: number;
 };
@@ -16,7 +17,15 @@ const problems: SegatoolsProblem[] =
     Object.values(import.meta.glob('./segatools/problems/*.ts', { eager: true }))
         .map(o => (o as { default: SegatoolsProblem }).default);
 
-export async function troubleshootSegatools(segatoolsString: string, binPath?: FileSystemDirectoryEntry): Promise<SegatoolsResponse[]> {
+const responseSorting: Record<SegatoolsResponseType, number> = {
+    "severe": 5,
+    "error": 4,
+    "warning": 3,
+    "success": 2,
+    "loading": 1
+}
+
+export async function troubleshootSegatools(segatoolsString: string, binPath?: FileSystemDirectoryEntry, scope?: FileSystemDirectoryEntry): Promise<SegatoolsResponse[]> {
     /*
     
     Parsing an ini file is easy, right?
@@ -98,11 +107,17 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                                 });
                             } else
                                 if (binPath) {
-                                    let path = await accessRelativePath(binPath, value ?? "");
-                                    if ((!path || !value) && !isOptional || (isOptional && !path && value))
+                                    try {
+                                        let path = await accessRelativePath(binPath, value ?? "", scope);
+                                        if ((!path || !value) && !isOptional || (isOptional && !path && value))
+                                            responses.push({
+                                                type: "error", description: `Unable to locate ${value}`, line: l
+                                            })
+                                    } catch(e) {
                                         responses.push({
-                                            type: "error", description: `Unable to locate ${value}`, line: l
+                                            type: "error", description: e as string, line: l
                                         })
+                                    }
                                 }
                             break;
                         case "keycode":
@@ -121,7 +136,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                     segatools[section][key] = value;
                 } else
                     return r(responses.push({
-                        type: "warning", description: `"${key}" (in [${section}]) doesn't exist or you may have made a typo. It will be ignored in analysis.`, line: l
+                        type: "warning", description: `"${key}" (in [${section}]) doesn't seem to exist or you may have made a typo. It will be ignored in analysis.`, line: l
                     }))
             } else
                 return r(responses.push({
@@ -140,28 +155,37 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
 
     // this is ugly
     if (segatools["vfs"]["option"] && binPath) {
-        let file = await accessRelativePath(binPath, segatools["vfs"]["option"] as string) as FileSystemDirectoryEntry | undefined;
-        if (file) {
-            // check options
-            let options: FileSystemEntry[] = await new Promise(r => (file as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
-            if (options.length <= 0)
-                responses.push({
-                    type: "error",
-                    description: "You have no options! Are you fucking stupid? Get some damn options!"
-                })
-            for (let idx = 0; options.length > idx; idx++) {
-                let option = options[idx];
-                if (isOption(option.name) && option.isDirectory) {
-                    let children: FileSystemEntry[] = await new Promise(r => (option as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
-                    if (children.find(child => isOption(child.name)))
-                        responses.push({
-                            type: "error",
-                            description: `Option ${option.name} contains an unnecessary child folder.`
-                        })
+        try {
+            let file = await accessRelativePath(binPath, segatools["vfs"]["option"] as string) as FileSystemDirectoryEntry | undefined;
+            if (file) {
+                // check options
+                let options: FileSystemEntry[] = await new Promise(r => (file as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
+                if (options.length <= 0)
+                    responses.push({
+                        type: "error",
+                        description: "You have no options! Are you fucking stupid? Get some damn options!"
+                    })
+                for (let idx = 0; options.length > idx; idx++) {
+                    let option = options[idx];
+                    if (isOption(option.name) && option.isDirectory) {
+                        let children: FileSystemEntry[] = await new Promise(r => (option as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
+                        if (children.find(child => isOption(child.name)))
+                            responses.push({
+                                type: "error",
+                                description: `Option ${option.name} contains an unnecessary child folder.`
+                            })
+                    }
                 }
             }
-        }
+        } catch(e) {};
     }
+
+    if (!binPath)
+        responses.push({
+            type: "warning",
+            description: "Limited functionality is available because only segatools.ini is available. Drag and drop your folder next time."
+        })
+    responses.sort((a, b) => responseSorting[b.type] - responseSorting[a.type]);
 
     return responses;
 };

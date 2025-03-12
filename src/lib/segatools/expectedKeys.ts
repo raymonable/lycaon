@@ -33,7 +33,8 @@ export const expectedKeys = {
         "subnet": ["string"] // not adding a type for ip addresses
     },
     netenv: {
-        "enable": "boolean"
+        "enable": "boolean",
+        "addrSuffix": ["number"]
     },
     system: {
         "enable": "boolean",

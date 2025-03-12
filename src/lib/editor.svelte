@@ -72,4 +72,4 @@
     onMount(init);
 </script>
 
-<div class="source-container" bind:this={container}></div>
+<div class="source-container" translate="no" bind:this={container}></div>
