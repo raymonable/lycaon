@@ -57,6 +57,7 @@
             options: {
               isWholeLine: true,
               linesDecorationsClassName: `editor-${v.type}`,
+              hoverMessage: {value: v.description}
             }
           }
         })

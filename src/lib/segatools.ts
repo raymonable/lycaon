@@ -86,7 +86,7 @@ export function troubleshootSegatools(segatoolsString: string): SegatoolsRespons
                             // TODO: take in the user's path data. For now, partially stub.
                             if (value.at(1) == ":")
                                 responses.push({
-                                    type: "warning", description: "Do not hardcode your paths. Use relativity.", line: l
+                                    type: "warning", description: "Avoid using absolute paths.", line: l
                                 });
                             break;
                         case "keycode":
