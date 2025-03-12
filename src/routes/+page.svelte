@@ -81,9 +81,12 @@
 </script>
 <div class="container">
   <h1 translate="no">
-    deficithm 
-    <div class="subtext">
-      for deficiency of common sense
+    <img src="/facepalm.webp"> 
+    <div>
+      dumbassithm 
+      <span class="subtext">
+        you know why you're here
+      </span>
     </div>
   </h1>
   <p>

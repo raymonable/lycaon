@@ -81,7 +81,7 @@ export async function drop(event: Event & { currentTarget: EventTarget & HTMLInp
     let input = (event.target as HTMLInputElement);
     if (!input.files) return;
 
-    if (input.webkitEntries.length > 0)
+    if (input.webkitEntries.length > 0) {
         if (input.webkitEntries[0].name == "segatools.ini") {
             return {
                 segatoolsPath: input.files[0],
@@ -89,6 +89,14 @@ export async function drop(event: Event & { currentTarget: EventTarget & HTMLInp
             };
         } else if (input.webkitEntries[0].isDirectory) {
             return await findSegatools(input.webkitEntries[0]);
+        } else
+            throw new Error("Not a segatools.ini selected")
+    } else if (input.files.length > 0)
+        if (input.files[0].name == "segatools.ini") {
+            return {
+                segatoolsPath: input.files[0],
+                responses: []
+            };
         } else
             throw new Error("Not a segatools.ini selected")
 };

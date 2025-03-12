@@ -57,8 +57,26 @@
                     token: "comment",
                     foreground: "e9b3ff"
                 }*/
+                {
+                    token: "comment",
+                    foreground: "7f80ae"
+                },
+                {
+                    token: "keyword",
+                    foreground: "404b65"
+                },
+                {
+                    token: "variable",
+                    foreground: "99a9d2"
+                },
+                {
+                    token: "string",
+                    foreground: "ffffff"
+                }
             ],
-            colors: {}
+            colors: {
+                "editor.background": "#11131b"
+            }
         })
         monaco.editor.setTheme('default')
         editor = monaco.editor.create(container, {

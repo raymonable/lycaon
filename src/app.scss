@@ -3,12 +3,12 @@
 body {
     font-family: "Zen Kaku Gothic New";
 
-    background: #17161d;
+    background: #04090a;
     color: #ffffff;
 }
 button {
     color: #ffffff;
-    background: #664c85;
+    background: #404b65;
     padding: 0.5em 1em;
     border-radius: 0.25em;
     font-family: "Zen Kaku Gothic New";
@@ -20,8 +20,6 @@ button {
     width: calc(100% - 1em);
     aspect-ratio: 5;
     margin: 0.5em;
-    background: #0002;
-    border-radius: 0.5em;
 
     .drag {
         width: calc(100% - 2em);
@@ -58,22 +56,25 @@ h1 {
     margin: 0;
     position: relative;
     width: fit-content;
-
     font-weight: bolder;
-    letter-spacing: 0.425em;
+
+    &, div {
+        display: flex;
+        align-items: center;
+    }
+    div {
+        flex-direction: column;
+    }
+    img {
+        margin-right: 0.5em;
+    }
 
     .subtext {
-        position: absolute;
-        bottom: 0%;
-        transform: translate(-100%, 50%);
-        left: 100%;
         font-size: 0.5em;
         width: 100%;
-        text-align: right;
         color: #7a7b8f;
         letter-spacing: 0;
         font-weight: normal;
-        overflow-x: hidden;
         white-space: nowrap;
     }
 }
@@ -107,19 +108,19 @@ h1 {
     .message {
         &.severe,
         &.error {
-            --color: #e25050;
+            --color: #df9daf;
             &::before {
                 content: "✕";
             }
         }
         &.warning {
-            --color: #f1d66a;
+            --color: #dbce97;
             &::before {
                 content: "!";
             }
         }
         &.success {
-            --color: #62b67e;
+            --color: #91c9a4;
             &::before {
                 content: "✓";
             }
@@ -132,12 +133,13 @@ h1 {
         }
 
         padding: 0.5em 1em;
-        background: #1e1b26;
+        background: #11131b;
         border-left: solid 0.25em var(--color);
 
         &::before {
             margin-right: 1em;
             color: var(--color);
+            font-weight: bolder;
         }
     }
 }
