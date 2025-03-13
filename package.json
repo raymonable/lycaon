@@ -4,8 +4,9 @@
   "version": "1.0.2",
   "type": "module",
   "scripts": {
+    "getpatch": "bun tools/extract.ts",
     "dev": "vite",
-    "build": "vite build",
+    "build": "bun getpatch && vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },

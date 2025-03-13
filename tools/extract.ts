@@ -1,5 +1,5 @@
 import { fetch, write } from "bun"
-import { mkdir } from "node:fs/promises"
+import { exists, mkdir } from "node:fs/promises"
 
 const OUT_PATH = "src/patches"
 const REPO_OWNER = "two-torial"
@@ -59,7 +59,7 @@ async function extractPatchList(url) {
 
 async function processAllHtmlFiles() {
     // Create the output directory if it doesn't exist
-    await mkdir(OUT_PATH)
+    if (!await exists(OUT_PATH)) await mkdir(OUT_PATH)
 
     const htmlFiles = await getHtmlFiles()
     
