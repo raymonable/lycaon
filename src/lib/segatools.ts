@@ -135,7 +135,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                     segatools[section][key] = value;
                 } else
                     return r(responses.push({
-                        type: "warning", description: `"${key}" (in [${section}]) doesn't seem to exist or you may have made a typo. It will be ignored in analysis.`, line: l
+                        type: "warning", description: `"${key}" (in [${section}]) seems unusual (or you may have just made a typo). It will be ignored in analysis.`, line: l
                     }))
             } else
                 return r(responses.push({
