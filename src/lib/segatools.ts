@@ -152,7 +152,7 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
             responses.push(match);
     }
 
-    // this is ugly
+    // TODO: reorganize, this is ugly
     if (segatools.vfs)
         if (segatools.vfs.option && binPath)
             try {
@@ -160,10 +160,10 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                 if (file) {
                     // check options
                     let options: FileSystemEntry[] = await new Promise(r => (file as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
-                    if (options.length <= 0)
+                    if (options.filter(v => isOption(v.name)).length <= 0)
                         responses.push({
                             type: "error",
-                            description: "You have no options! Are you fucking stupid? Get some damn options!"
+                            description: "Either you have no options, or you picked the wrong folder. You NEED A001 for the game to work properly."
                         })
                     for (let idx = 0; options.length > idx; idx++) {
                         let option = options[idx];
