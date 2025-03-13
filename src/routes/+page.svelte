@@ -5,6 +5,7 @@
   import Editor from "$lib/editor.svelte";
 
   import hotkeys from "hotkeys-js";
+  import { createPackage, saveFile } from "$lib/segatools/package";
 
   type SegatoolsState = "drop" | "success";
 
@@ -23,27 +24,7 @@
   }
 
   function save() {
-    if ('showSaveFilePicker' in window) {
-      window.showSaveFilePicker({
-        types: [
-            {
-                description: "Override your segatools.ini",
-                accept: { "text/plain": [".ini"] },
-            },
-        ],
-        suggestedName: "segatools.ini"
-      }).then(async handle => {
-        const writable = await handle.createWritable();
-        await writable.write(defaultSegatoolsString);
-        await writable.close();
-      })
-    } else {
-      // due to browser limitations we just have to download it :sob:
-      let download = document.createElement("a");
-      download.href = URL.createObjectURL(new Blob([defaultSegatoolsString], {type: "text/plain"}));
-      download.download = "segatools.ini"
-      download.click();
-    }
+    saveFile(new Blob([defaultSegatoolsString], {type: "text/plain"}), "segatools.ini");
   };
   hotkeys("ctrl+s,command+s", e => {
     e.preventDefault(); save();
@@ -107,6 +88,11 @@
     <p>
       <button on:click={save}>Save</button>
     </p>
+    {#if segatoolsPath}
+      <p>
+        <button on:click={() => {if (binPath && scopePath) createPackage(binPath, responses, defaultSegatoolsString, scopePath)}}>Generate troubleshooting package</button>
+      </p>
+    {/if}
   {:else}
     <div class="drag-container">
       <div class="drag">

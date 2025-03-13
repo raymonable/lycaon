@@ -28,6 +28,7 @@
     "@types/wicg-file-system-access": "^2023.10.5",
     "hotkeys-js": "^3.13.9",
     "js-levenshtein": "^1.1.6",
+    "jszip": "^3.10.1",
     "monaco-editor": "^0.52.2",
     "sass-embedded": "^1.85.1"
   }
