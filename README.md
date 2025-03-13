@@ -1,4 +1,4 @@
-# lycaon (name pending)
+# lycaon project
 
 A segatools.ini editor / checker.
 
