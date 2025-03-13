@@ -11,11 +11,17 @@ export type Segatools = Record<string, Record<string, number | string | boolean>
 export interface SegatoolsProblem {
     match: (entries: Record<string, Record<string, number | string | boolean>>) => Promise<undefined | SegatoolsResponse> // Try to return a response whenever possible.
 };
+export interface SegatoolsPathProblem {
+    match: (entries: Record<string, Record<string, number | string | boolean>>, binPath: FileSystemDirectoryEntry, scope: FileSystemDirectoryEntry) => Promise<undefined | SegatoolsResponse>
+};
 
 const sectionRegex = /^[\[\]].*?$/;
 const problems: SegatoolsProblem[] = 
     Object.values(import.meta.glob('./segatools/problems/*.ts', { eager: true }))
         .map(o => (o as { default: SegatoolsProblem }).default);
+const paths: SegatoolsPathProblem[] = 
+    Object.values(import.meta.glob('./segatools/paths/*.ts', { eager: true }))
+        .map(o => (o as { default: SegatoolsPathProblem }).default);
 
 const responseSorting: Record<SegatoolsResponseType, number> = {
     "severe": 5,
@@ -35,13 +41,13 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
     Step 1. Extract keys and values, while checking for syntax errors.
         - ... also check paths.
     Step 2. Look for specific issues.
-    Step 3. Check options.
+    Step 3. Check specific information about paths.
     
     */
 
     const segatools: Segatools = {};
     let responses: SegatoolsResponse[] = [];
-    let activatedSections: string[] = [];
+    let activatedSections: (string | null)[] = [];
 
     let segments = segatoolsString.split("\n")
         .map(l => l.split(/[\r;]/g)[0]) // Strip away any comments
@@ -59,12 +65,14 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
                 let sectionName = j.slice(1, j.length - 1);
                 if (sectionName == "gpio")
                     responses.push({
-                        type: "severe", description: "You are using [gpio] instead of [system]. It's likely that your segatools.ini and/or segatools itself are out of date. Update them to continue."
+                        type: "error", description: "You are using [gpio] instead of [system]. It's likely that your segatools.ini and/or segatools itself are out of date. Update them to continue."
                     })
-                if (!expectedKeys[sectionName])
+                if (!expectedKeys[sectionName]) {
+                    activatedSections.push(null);
                     return r(responses.push({
                         type: "error", description: `Unexpected section [${sectionName}]`, line: l
                     }))
+                }
                 activatedSections.push(sectionName);
                 return r(true);
             };
@@ -81,67 +89,68 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
             let value: string | number | boolean = j.split("=")[1];
             let section = activatedSections[activatedSections.length - 1];
             
-            if (expectedKeys[section]) {
-                if (expectedKeys[section][key]) {
-                    let isOptional = Array.isArray(expectedKeys[section][key]) 
-                    let type = isOptional
-                        ? expectedKeys[section][key][0] : expectedKeys[section][key];
-                    switch (type) {
-                        case "string":
-                            // We can't type check strings.
-                            break;
-                        case "boolean":
-                            if (value != "0" && value != "1")
-                                responses.push({
-                                    type: "error", description: `${key} should be a boolean, but isn't.`, line: l
-                                });
-                            value = value == "1";
-                            break;
-                        case "path":
-                            // TODO: take in the user's path data. For now, partially stub.
-                            
-                            if (value.at(1) == ":") {
-                                responses.push({
-                                    type: "warning", description: `Avoid using absolute paths, as I cannot verify the existence ${key}.`, line: l
-                                });
-                            } else
-                                if (binPath) {
-                                    try {
-                                        let path = await accessRelativePath(binPath, value ?? "", scope);
-                                        if ((!path || !value) && !isOptional || (isOptional && !path && value))
+            if (section)
+                if (expectedKeys[section]) {
+                    if (expectedKeys[section][key]) {
+                        let isOptional = Array.isArray(expectedKeys[section][key]) 
+                        let type = isOptional
+                            ? expectedKeys[section][key][0] : expectedKeys[section][key];
+                        switch (type) {
+                            case "string":
+                                // We can't type check strings.
+                                break;
+                            case "boolean":
+                                if (value != "0" && value != "1")
+                                    responses.push({
+                                        type: "error", description: `${key} should be a boolean, but isn't.`, line: l
+                                    });
+                                value = value == "1";
+                                break;
+                            case "path":
+                                // TODO: take in the user's path data. For now, partially stub.
+                                
+                                if (value.at(1) == ":") {
+                                    responses.push({
+                                        type: "warning", description: `Avoid using absolute paths, as I cannot verify the existence ${key}.`, line: l
+                                    });
+                                } else
+                                    if (binPath) {
+                                        try {
+                                            let path = await accessRelativePath(binPath, value ?? "", scope);
+                                            if ((!path || !value) && !isOptional || (isOptional && !path && value))
+                                                responses.push({
+                                                    type: "error", description: `Unable to locate ${value}`, line: l
+                                                })
+                                        } catch(e) {
                                             responses.push({
-                                                type: "error", description: `Unable to locate ${value}`, line: l
+                                                type: "error", description: e as string, line: l
                                             })
-                                    } catch(e) {
-                                        responses.push({
-                                            type: "error", description: e as string, line: l
-                                        })
+                                        }
                                     }
-                                }
-                            break;
-                        case "keycode":
-                            // Nothing much to do here! Maybe in the future we can check if it's really a byte within 0-255 range?
-                            break;
-                        case "number":
-                            if (isNaN(parseFloat(value)))
-                                responses.push({
-                                    type: "error", description: `${key} should be a number, but isn't.`, line: l
-                                });
-                                value = parseInt(value);
-                            break;
-                    };
-                    if (!segatools[section])
-                        segatools[section] = {};
-                    segatools[section][key] = value;
+                                break;
+                            case "keycode":
+                                // Nothing much to do here! Maybe in the future we can check if it's really a byte within 0-255 range?
+                                break;
+                            case "number":
+                                if (isNaN(parseFloat(value)))
+                                    responses.push({
+                                        type: "error", description: `${key} should be a number, but isn't.`, line: l
+                                    });
+                                    value = parseInt(value);
+                                break;
+                        };
+                        if (!segatools[section])
+                            segatools[section] = {};
+                        segatools[section][key] = value;
+                    } else
+                        return r(responses.push({
+                            type: "warning", description: `"${key}" (in [${section}]) seems unusual (or you may have just made a typo). It will be ignored in analysis.`, line: l
+                        }))
                 } else
                     return r(responses.push({
-                        type: "warning", description: `"${key}" (in [${section}]) seems unusual (or you may have just made a typo). It will be ignored in analysis.`, line: l
+                        type: "error", description: "Invalid section.", line: l
                     }))
-            } else
-                return r(responses.push({
-                    type: "error", description: "Invalid section.", line: l
-                }))
-            r(true);
+                r(true);
         })
     }
 
@@ -152,45 +161,24 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
             responses.push(match);
     }
 
-    // TODO: reorganize, this is ugly
-    if (segatools.vfs)
-        if (segatools.vfs.option && binPath)
-            try {
-                let file = await accessRelativePath(binPath, segatools.vfs.option as string) as FileSystemDirectoryEntry | undefined;
-                if (file) {
-                    // check options
-                    let options: FileSystemEntry[] = await new Promise(r => (file as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
-                    if (options.filter(v => isOption(v.name)).length <= 0)
-                        responses.push({
-                            type: "error",
-                            description: "Either you have no options, or you picked the wrong folder. You NEED A001 for the game to work properly."
-                        })
-                    for (let idx = 0; options.length > idx; idx++) {
-                        let option = options[idx];
-                        if (isOption(option.name) && option.isDirectory) {
-                            let children: FileSystemEntry[] = await new Promise(r => (option as FileSystemDirectoryEntry)?.createReader().readEntries(f => r(f)));
-                            if (children.find(child => isOption(child.name)))
-                                responses.push({
-                                    type: "error",
-                                    description: `Option ${option.name} contains an unnecessary child folder.`
-                                })
-                        }
-                    }
-                }
-            } catch(e) {};
-            
+    if (binPath && scope)
+        for (let idx = 0; paths.length > idx; idx++) {
+            let path = paths[idx];
+            let match = await path.match(segatools, binPath, scope);
+            if (match)
+                responses.push(match);
+        };
+
     if (!binPath)
         responses.push({
             type: "warning",
             description: "Limited functionality is available because only segatools.ini is available. Next time, drag and drop your folder."
         })
-    if (responses.find(v => v.type == "severe")) {
+    if (responses.find(v => v.type == "severe"))
         responses = [...responses.filter(v => v.type == "severe"), {
             type: "warning",
             description: "All other errors have been hidden. Please resolve the above to continue."
-        }]
-    }
-
+        }];
     responses.sort((a, b) => responseSorting[b.type] - responseSorting[a.type]);
 
     return responses;
