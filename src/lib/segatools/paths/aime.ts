@@ -12,12 +12,17 @@ export default {
 
             if (file) {
                 let data = await new Promise(r => (file as FileSystemFileEntry).file(f => r(f))) as File;
-                let aime = await data.text();
+                let aime = (await data.text());
                 
-                if (aime.length != 20)
+                if (isNaN(parseInt(aime)))
                     return {
                         type: "warning",
-                        description: `Your Aime access code is only ${aime.length} digits long (out of 20).`
+                        description: "What did you do to your Aime access code? It should be 20 numbers."
+                    }
+                if (aime.replace(/\D/g,'').length != 20)
+                    return {
+                        type: "warning",
+                        description: `Your Aime access code is ${aime.length < 20 ? "only ": ""}${aime.length} digits long (of 20).`
                     }
                 if (aime.at(0) == "3")
                     return {
