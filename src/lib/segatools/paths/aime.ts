@@ -19,10 +19,11 @@ export default {
                         type: "warning",
                         description: "What did you do to your Aime access code? It should be 20 numbers."
                     }
-                if (aime.replace(/\D/g,'').length != 20)
+                let aimeLength = aime.replace(/\D/g,'').length;
+                if (aimeLength != 20)
                     return {
                         type: "warning",
-                        description: `Your Aime access code is ${aime.length < 20 ? "only ": ""}${aime.length} digits long (of 20).`
+                        description: `Your Aime access code is ${aimeLength < 20 ? "only ": ""}${aimeLength} digits long (of 20).`
                     }
                 if (aime.at(0) == "3")
                     return {
