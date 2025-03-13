@@ -7,6 +7,7 @@ const REPO_NAME = "webpatcher"
 const BRANCH = "master"
 const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${BRANCH}?recursive=1`
 const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/`
+const TARGETS = ["chusan"];
 
 async function getHtmlFiles() {
     const response = await fetch(API_URL)
@@ -14,7 +15,11 @@ async function getHtmlFiles() {
 
     if (!data.tree) throw new Error("Failed to fetch repository file tree")
 
-    return data.tree.filter(f => f.path.endsWith(".html") && !f.path.endsWith("index.html")).map(f => f.path)
+    return data.tree.filter(f => 
+        f.path.endsWith(".html") 
+        && !f.path.endsWith("index.html") 
+        && TARGETS.find(v => f.path.substring(0, v.length) == v)
+    ).map(f => f.path)
 }
 
 async function processScriptBlock(script: string) {
