@@ -29,4 +29,4 @@ dist-ssr
 
 # Specific files
 src/lib/config/dns.json
-src/patches
+src/lib/config/patches

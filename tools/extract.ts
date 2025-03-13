@@ -1,7 +1,7 @@
 import { fetch, write } from "bun"
 import { exists, mkdir } from "node:fs/promises"
 
-const OUT_PATH = "src/patches"
+const OUT_PATH = "src/lib/config/patches"
 const REPO_OWNER = "two-torial"
 const REPO_NAME = "webpatcher"
 const BRANCH = "master"
