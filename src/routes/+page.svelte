@@ -111,17 +111,17 @@
     <div>
       dumbassithm 
       <span class="subtext">
-        you know why you're here
+        thinking is hard
       </span>
     </div>
   </h1>
   <p>
-    <i>This tool is experimental. Take all information with discretion.</i><br>
+    <i>This tool performs a surface-level diagnosis of your game data. Information may be incorrect. Use discretion.</i><br>
     Do <strong>NOT</strong> share your segatools.ini with people you do not trust, as it contains your keychip.
   </p>
   <p>
     This tool is only intended for「CHUNITHM NEW!!」or newer.
-    All data (besides DNS verification) is processed on the client. 
+    All data (besides DNS verification) is processed on the client.
   </p>
   {#if !navigator.userAgent.includes("Chrome")}
   <p>
@@ -155,7 +155,7 @@
     {#if patches.length > 0}
       <details>
         <summary>Patches</summary>
-        Patches are currently read-only.<br>
+        Patches are read-only.<br>
         Go to <a href="https://patcher.two-torial.xyz" target="_blank">https://patcher.two-torial.xyz</a> to generate patches.
         {#each patches as executable}
           <div class="patch-header">
