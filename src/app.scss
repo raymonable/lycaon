@@ -16,12 +16,17 @@ button {
     border: none;
 }
 
+a {
+    color: #404b65;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.25s color;
+}
+
 .version {
     margin-left: 0.5em;
     &, a {
         color: #fff3;
-        text-decoration: none;
-        transition: 0.25s color;
     }
     a:hover {
         color: #fff6;
@@ -92,6 +97,14 @@ h1 {
     }
 }
 
+details {
+    summary {
+        font-size: 1.25em;
+        margin: 1em 0;
+        cursor: pointer;
+    }
+}
+
 .container {
     width: 800px;
     margin: 1em 0;
@@ -153,6 +166,70 @@ h1 {
             margin-right: 1em;
             color: var(--color);
             font-weight: bolder;
+        }
+    }
+}
+
+.patch-header {
+    font-size: 1.5em;
+    margin: 0.5em 0;
+    padding: 0 0.5em;
+    border-left: solid 0.125em #fff6;
+    
+    small {
+        font-size: 0.625em;
+        color: #fff6;
+        margin-left: 1em;
+    }
+}
+.patch-list {
+    .patch {
+        padding: 0.25em 0;
+        display: flex;
+
+        // it looks atrocious without flexbox so this'll have to do
+        &::before {
+            content: "•";
+            margin-right: 0.5em;
+        }
+
+        input[type="checkbox"] {
+            --size: 2em;
+            margin: 0 1em;
+            appearance: none;
+            border: 1px solid #666;
+            border-radius: var(--size) !important;
+            height: var(--size);
+            aspect-ratio: 1.75;
+            cursor: pointer;
+            position: relative;
+            transition: 150ms background-color;
+            background-color: black;
+            // handle
+            &::after {
+                position: absolute;
+                aspect-ratio: 1 / 1;
+                border-radius: var(--size);
+                height: calc( var(--size) * 0.8 );
+                top: 50%;
+                left: calc( var(--size) * 0.1 ); // (1 - 0.8) / 2
+                transform: translateY(-50%);
+                background-color:#666;
+                content: '';
+                transition: 150ms left;
+            }
+            &:checked {
+                border: 1px solid #aaa;
+                background: #404b65;
+                &::after {
+                    background: #aaa;
+                    left: calc( 100% - calc( var(--size) * 0.9 ) ); // ((1 - 0.8) / 2) + 0.8
+                }
+            }
+        }
+        
+        .patch-danger {
+            color: #e1ab75;
         }
     }
 }

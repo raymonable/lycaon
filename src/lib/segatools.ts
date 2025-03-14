@@ -31,7 +31,7 @@ const responseSorting: Record<SegatoolsResponseType, number> = {
     "loading": 1
 }
 
-export async function troubleshootSegatools(segatoolsString: string, binPath?: FileSystemDirectoryEntry, scope?: FileSystemDirectoryEntry): Promise<SegatoolsResponse[]> {
+export async function troubleshootSegatools(segatoolsString: string, binPath?: FileSystemDirectoryEntry, scope?: FileSystemDirectoryEntry, add?: SegatoolsResponse[]): Promise<SegatoolsResponse[]> {
     /*
     
     Parsing an ini file is easy, right?
@@ -168,6 +168,8 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
             if (match)
                 responses.push(match);
         };
+    if (add)
+        responses = [...responses, ...add];
 
     if (!binPath)
         responses.push({

@@ -1,10 +1,11 @@
 <script lang="ts">
   import { troubleshootSegatools, type SegatoolsProblem, type SegatoolsResponse } from "$lib/segatools";
   
-  import { drop } from "$lib/segatools/fs";
+  import { accessRelativePath, drop } from "$lib/segatools/fs";
   import Editor from "$lib/editor.svelte";
 
   import hotkeys from "hotkeys-js";
+  import { getExecutable, processPatches, type ChusanExecutable } from "$lib/segatools/patch";
 
   type SegatoolsState = "drop" | "success";
 
@@ -15,10 +16,12 @@
   let scopePath: FileSystemDirectoryEntry | undefined;
   let binPath: FileSystemDirectoryEntry | undefined;
   
+  let patches: ChusanExecutable[] = [];
+  let patchResponses: SegatoolsResponse[] = [];
   let defaultSegatoolsString: string;
 
   async function updateSegatools(data: string) {
-    responses = await troubleshootSegatools(data, binPath, scopePath);
+    responses = await troubleshootSegatools(data, binPath, scopePath, patchResponses);
     defaultSegatoolsString = data;
   }
 
@@ -49,6 +52,28 @@
     e.preventDefault(); save();
   });
 
+  async function analyzeExecutables(binPath: FileSystemDirectoryEntry, scopePath: FileSystemDirectoryEntry) {
+    for (let target of ["chusanApp.exe", "amdaemon.exe"]) {
+      let location = (await accessRelativePath(binPath, target, scopePath)) as FileSystemFileEntry;
+      if (!location) continue;
+
+      let binary = (await new Promise(async r => location.file(f => r(f)))) as File;
+      if (!binary) continue;
+
+      let executable = await getExecutable(target, binary);
+      if (executable) {
+        if ((executable as ChusanExecutable).executable) {
+          patches.push(executable as ChusanExecutable);
+          patchResponses.push({
+            type: "success",
+            description: `Executable ${(executable as ChusanExecutable).executable} is detected to be version ${(executable as ChusanExecutable).version}`
+          })
+        } else if ((executable as SegatoolsResponse).type)
+          patchResponses.push(executable as SegatoolsResponse);
+      }
+    };
+  }
+
   async function safeDrop(e: Event & { currentTarget: EventTarget & HTMLInputElement; }) {
     responses = [{
       description: "Processing. Please wait a moment.",
@@ -73,7 +98,8 @@
         scopePath = response?.scope;
         binPath = await new Promise(r => (response?.segatoolsPath as FileSystemEntry)?.getParent(f => r(f as FileSystemDirectoryEntry)));
         segatoolsPath = response?.segatoolsPath as FileSystemFileEntry;
-        
+
+        await analyzeExecutables(binPath, scopePath);
         await updateSegatools(await f.text());
         state = "success";
       });
@@ -115,15 +141,43 @@
     </div>
   {/if}
   {#if responses.length > 0}
-    <h2>Feedback</h2>
-    <div class="message-list">
-      {#each responses as response}
-        <div class={`message ${response.type}`}>
-          <!-- TODO: figure out how to tell the editor component to navigate to the line -->
-          {response.description} {response.line ? `(Line ${response.line + 1})`: ``}
-        </div>
-      {/each}
-    </div>
+    <details open>
+      <summary>Summary</summary>
+      <div class="message-list">
+        {#each responses as response}
+          <div class={`message ${response.type}`}>
+            <!-- TODO: figure out how to tell the editor component to navigate to the line -->
+            {response.description} {response.line ? `(Line ${response.line + 1})`: ``}
+          </div>
+        {/each}
+      </div>
+    </details>
+    {#if patches.length > 0}
+      <details>
+        <summary>Patches</summary>
+        Patches are currently read-only.<br>
+        Go to <a href="https://patcher.two-torial.xyz" target="_blank">https://patcher.two-torial.xyz</a> to generate patches.
+        {#each patches as executable}
+          <div class="patch-header">
+            {executable.executable}
+            <small>
+              ({executable.version})
+            </small>
+          </div>
+          <ul class="patch-list">
+            {#each executable.patches.filter(patch => patch.patches) as patch}
+              <li class="patch">
+                {patch.name}:
+                <input type="checkbox" checked={patch.enabled} disabled>
+                {#if patch.danger}
+                  <span class="patch-danger" title="Avoid using this patch.">⚠</span>
+                {/if}
+              </li>
+            {/each}
+          </ul>
+        {/each}
+      </details>
+    {/if}
   {/if}
   <p>
     <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game"><br>

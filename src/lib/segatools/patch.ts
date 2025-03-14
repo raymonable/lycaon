@@ -8,6 +8,8 @@ export interface ChusanPatch {
         on: number[],
         offset: number
     }[],
+    tooltip?: string,
+    danger?: string,
     enabled?: boolean
 };
 export interface ChusanExecutable {
@@ -51,7 +53,7 @@ export async function getExecutable(name: string, binary: Blob) : Promise<Chusan
                 )
             })
     );
-    if (executable) return executable;
+    if (executable) return await processPatches(binary, executable);
     if (searchInArray(array, "KeRnEl32.dLl")) {
         return {
             type: "error",

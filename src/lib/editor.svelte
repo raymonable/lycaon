@@ -52,7 +52,6 @@
             base: 'vs-dark',
             inherit: true,
             rules: [
-                // TODO: find suitable colors
                 /*{
                     token: "comment",
                     foreground: "e9b3ff"
