@@ -1,7 +1,7 @@
 {
   "name": "incompetence",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "scripts": {
     "getpatch": "bun tools/extract.ts",
