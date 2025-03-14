@@ -1,8 +1,20 @@
 # lycaon project
 
-A segatools.ini editor / checker.
+A segatools.ini editor / checker for a specific slider-based game.
 
-> :warning: Firefox and other non-Chromium based browsers is not properly supported yet as `webkitEntries` (yes, an old API, whatever) doesn't work as intended on Firefox.
+> :warning: Firefox and other non-Chromium based browsers may have issues as `webkitEntries` (yes, an old API, whatever) doesn't work as intended on Firefox.
+
+## Features
+
+Checks:
+- All paths in segatools.ini<br>
+    *Also does a brief check of the contents of paths*
+- Access code formatting
+- Keychip formatting
+- Game server (:construction:)
+- Binary versions (based on 2T patches)
+
+Generally, if there are no errors mentioning it and it's shown on the list above, you can probably rule it out as being problematic.
 
 ## Hosting
 
