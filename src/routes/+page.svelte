@@ -72,6 +72,19 @@
           patchResponses.push(executable as SegatoolsResponse);
       }
     };
+    // should we check more than just "start.bat"??
+    let location = (await accessRelativePath(binPath, "start.bat", scopePath)) as FileSystemFileEntry;
+    if (location) {
+      let binary = (await new Promise(async r => location.file(f => r(f)))) as File;
+      if (binary) {
+        if (!(await binary.text()).match(/OPENSSL_ia32cap/g))
+          patchResponses.push({
+            type: "warning",
+            description: `Your start.bat does not contain the OpenSSL patch. You may experience issues if you're using an Intel CPU.`,
+            href: "https://two-torial.xyz/games/chunithmverse/setup/#fixing-openssl-on-intel-10th-gen-and-newer-cpus"
+          })
+      }
+    }
   }
 
   async function safeDrop(e: Event & { currentTarget: EventTarget & HTMLInputElement; }) {
@@ -148,6 +161,9 @@
           <div class={`message ${response.type}`}>
             <!-- TODO: figure out how to tell the editor component to navigate to the line -->
             {response.description} {response.line ? `(Line ${response.line + 1})`: ``}
+            {#if response.href}
+              <a target="_blank" href={response.href}>(Solution)</a>
+            {/if}
           </div>
         {/each}
       </div>
@@ -181,6 +197,10 @@
   {/if}
   <p>
     <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game"><br>
-    <small class="version">Version {APP_VERSION}. <a href="https://github.com/raymonable/lycaon">Source code</a></small>
+    <small class="version">
+      Version {APP_VERSION} •
+      <a href="https://github.com/raymonable/lycaon">Source code</a> •
+      <a href="https://two-torial.xyz/errorcodes/sega/">Error codes list</a>
+    </small>
   </p>
 </div>

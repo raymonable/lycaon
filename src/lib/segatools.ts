@@ -5,6 +5,7 @@ export type SegatoolsResponseType = "severe" | "error" | "warning" | "success" |
 export interface SegatoolsResponse {
     type: SegatoolsResponseType;
     description: string;
+    href?: string;
     line?: number;
 };
 export type Segatools = Record<string, Record<string, number | string | boolean>>
