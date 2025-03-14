@@ -203,7 +203,7 @@
   <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game"><br>
   <small class="version">
     Version {APP_VERSION} •
-    <a href="https://github.com/raymonable/lycaon">Source code</a> •
-    <a href="https://two-torial.xyz/errorcodes/sega/">Error codes list</a>
+    <a href="https://github.com/raymonable/lycaon" target="_blank">Source code</a> •
+    <a href="https://two-torial.xyz/errorcodes/sega/" target="_blank">Error codes list</a>
   </small>
 </p>
