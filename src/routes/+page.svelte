@@ -85,6 +85,11 @@
           })
       }
     }
+    if (await accessRelativePath(binPath, "chunihook.dll", scopePath))
+      patchResponses.push({
+        type: "error",
+        description: "It appears you are using the \"chuni\" Segatools DLLs. You should be using \"chusan\" instead."
+      });
   }
 
   async function safeDrop(e: Event & { currentTarget: EventTarget & HTMLInputElement; }) {
