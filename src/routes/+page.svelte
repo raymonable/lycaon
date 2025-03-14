@@ -118,89 +118,87 @@
       });
   }
 </script>
-<div class="container">
-  <h1 translate="no">
-    <img src="/facepalm.webp" alt="Chuni Penguin facepalm"> 
-    <div>
-      dumbassithm 
-      <span class="subtext">
-        thinking is hard
-      </span>
+<h1 translate="no">
+  <img src="/facepalm.webp" alt="Chuni Penguin facepalm"> 
+  <div>
+    dumbassithm 
+    <span class="subtext">
+      thinking is hard
+    </span>
+  </div>
+</h1>
+<p>
+  <i>This tool performs a surface-level diagnosis of your game data. Information may be incorrect. Use discretion.</i><br>
+  Do <strong>NOT</strong> share your segatools.ini with people you do not trust, as it contains your keychip.
+</p>
+<p>
+  This tool is only intended for「CHUNITHM NEW!!」or newer.
+  All data (besides DNS verification) is processed on the client.
+</p>
+{#if !navigator.userAgent.includes("Chrome")}
+<p>
+  <b>You are on a non-Chromium browser. You will experience issues. Please switch to a Chromium-based browser.</b>
+</p>
+{/if}
+{#if (state as SegatoolsState) === "success"}
+  <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
+  <p>
+    <button on:click={save}>Save</button>
+  </p>
+{:else}
+  <div class="drag-container">
+    <div class="drag">
+      <input type="file" on:input={safeDrop}>
     </div>
-  </h1>
-  <p>
-    <i>This tool performs a surface-level diagnosis of your game data. Information may be incorrect. Use discretion.</i><br>
-    Do <strong>NOT</strong> share your segatools.ini with people you do not trust, as it contains your keychip.
-  </p>
-  <p>
-    This tool is only intended for「CHUNITHM NEW!!」or newer.
-    All data (besides DNS verification) is processed on the client.
-  </p>
-  {#if !navigator.userAgent.includes("Chrome")}
-  <p>
-    <b>You are on a non-Chromium browser. You will experience issues. Please switch to a Chromium-based browser.</b>
-  </p>
-  {/if}
-  {#if (state as SegatoolsState) === "success"}
-    <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
-    <p>
-      <button on:click={save}>Save</button>
-    </p>
-  {:else}
-    <div class="drag-container">
-      <div class="drag">
-        <input type="file" on:input={safeDrop}>
-      </div>
+  </div>
+{/if}
+{#if responses.length > 0}
+  <details open>
+    <summary>Summary</summary>
+    <div class="message-list">
+      {#each responses as response}
+        <div class={`message ${response.type}`}>
+          <!-- TODO: figure out how to tell the editor component to navigate to the line -->
+          {response.description} {response.line ? `(Line ${response.line + 1})`: ``}
+          {#if response.href}
+            <a target="_blank" href={response.href}>(Solution)</a>
+          {/if}
+        </div>
+      {/each}
     </div>
-  {/if}
-  {#if responses.length > 0}
-    <details open>
-      <summary>Summary</summary>
-      <div class="message-list">
-        {#each responses as response}
-          <div class={`message ${response.type}`}>
-            <!-- TODO: figure out how to tell the editor component to navigate to the line -->
-            {response.description} {response.line ? `(Line ${response.line + 1})`: ``}
-            {#if response.href}
-              <a target="_blank" href={response.href}>(Solution)</a>
-            {/if}
-          </div>
-        {/each}
-      </div>
+  </details>
+  {#if patches.length > 0}
+    <details>
+      <summary>Patches</summary>
+      Patches are read-only.<br>
+      Go to <a href="https://patcher.two-torial.xyz" target="_blank">https://patcher.two-torial.xyz</a> to generate patches.
+      {#each patches as executable}
+        <div class="patch-header">
+          {executable.executable}
+          <small>
+            ({executable.version})
+          </small>
+        </div>
+        <ul class="patch-list">
+          {#each executable.patches.filter(patch => patch.patches) as patch}
+            <li class="patch">
+              {patch.name}:
+              <input type="checkbox" checked={patch.enabled} disabled>
+              {#if patch.danger}
+                <span class="patch-danger" title="Avoid using this patch.">⚠</span>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      {/each}
     </details>
-    {#if patches.length > 0}
-      <details>
-        <summary>Patches</summary>
-        Patches are read-only.<br>
-        Go to <a href="https://patcher.two-torial.xyz" target="_blank">https://patcher.two-torial.xyz</a> to generate patches.
-        {#each patches as executable}
-          <div class="patch-header">
-            {executable.executable}
-            <small>
-              ({executable.version})
-            </small>
-          </div>
-          <ul class="patch-list">
-            {#each executable.patches.filter(patch => patch.patches) as patch}
-              <li class="patch">
-                {patch.name}:
-                <input type="checkbox" checked={patch.enabled} disabled>
-                {#if patch.danger}
-                  <span class="patch-danger" title="Avoid using this patch.">⚠</span>
-                {/if}
-              </li>
-            {/each}
-          </ul>
-        {/each}
-      </details>
-    {/if}
   {/if}
-  <p>
-    <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game"><br>
-    <small class="version">
-      Version {APP_VERSION} •
-      <a href="https://github.com/raymonable/lycaon">Source code</a> •
-      <a href="https://two-torial.xyz/errorcodes/sega/">Error codes list</a>
-    </small>
-  </p>
-</div>
+{/if}
+<p>
+  <img src="/read.webp" alt="Basic reading ability is needed to fully enjoy this game"><br>
+  <small class="version">
+    Version {APP_VERSION} •
+    <a href="https://github.com/raymonable/lycaon">Source code</a> •
+    <a href="https://two-torial.xyz/errorcodes/sega/">Error codes list</a>
+  </small>
+</p>
