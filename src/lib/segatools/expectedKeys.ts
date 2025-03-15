@@ -73,7 +73,7 @@ export const expectedKeys = {
         "ir": "keycode"
     },
     io4: {
-        "enabled": ["boolean"],
+        "enable": ["boolean"],
     },
     ir: {
         "ir1": ["keycode"],
