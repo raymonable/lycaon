@@ -31,6 +31,10 @@ export default {
                 }
                 optionInfos.push(`Options: ${optionNames.join(", ")}`)
             }
+            if (optionInfos.length <= 0) {
+                optionInfos.push("Unable to index options.");
+                optionInfoType = "warning";
+            }
             return {
                 description: optionInfos.join(". "),
                 type: optionInfoType
