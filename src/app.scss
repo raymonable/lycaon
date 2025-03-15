@@ -22,6 +22,18 @@ a {
     text-decoration: none;
     transition: 0.25s color;
 }
+.strip-whitespace {
+    display: inline-flex;
+}
+.spoiler {
+    color: transparent;
+    background: #404b65;
+    
+    &:hover {
+        color: inherit !important;
+        background: #04090a !important;
+    }
+}
 
 .version {
     margin-left: 0.5em;

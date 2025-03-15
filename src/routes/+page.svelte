@@ -164,7 +164,16 @@
       {#each responses as response}
         <div class={`message ${response.type}`}>
           <!-- TODO: figure out how to tell the editor component to navigate to the line -->
-          {response.description} {response.line ? `(Line ${response.line + 1})`: ``}
+          {#if response.description.match(response.censorKey) && response.censorKey}
+            <span class="strip-whitespace">
+              {response.description.split(response.censorKey)[0]}
+              <span class="spoiler">{response.censorKey}</span>
+              {response.description.split(response.censorKey)[1]}
+            </span>
+          {:else}
+            {response.description}
+          {/if}
+          {response.line ? `(Line ${response.line + 1})`: ``}
           {#if response.href}
             <a target="_blank" href={response.href}>(Solution)</a>
           {/if}

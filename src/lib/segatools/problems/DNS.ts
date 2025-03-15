@@ -32,7 +32,7 @@ export default {
             }
         else if (isIpAddress(address)) {
                 return {
-                    type: "success", description: `Your ALL.net server is set to ${address}`
+                    type: "success", description: `Your ALL.net server is set to ${address}`, censorKey: address.slice(2)
                 }
             } else if (isDomain(address))
                 return getDnsInformation(address);

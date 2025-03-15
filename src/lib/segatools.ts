@@ -5,6 +5,7 @@ export type SegatoolsResponseType = "severe" | "error" | "warning" | "success" |
 export interface SegatoolsResponse {
     type: SegatoolsResponseType;
     description: string;
+    censorKey?: string;
     href?: string;
     line?: number;
 };
