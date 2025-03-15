@@ -44,6 +44,7 @@ export const expectedKeys = {
         "dipsw3": "boolean",
     },
     gfx: {
+        "enable": ["boolean"],
         "windowed": "boolean",
         "framed": "boolean",
         "monitor": "number"
