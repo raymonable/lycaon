@@ -21,7 +21,7 @@ export function GET({url}) {
     } satisfies SegatoolsResponse), {headers: {'Content-Type': 'application/json'}});
 
     return new Response(JSON.stringify({
-        type: "success", description: `Your ALL.net server is set to ${dns[address] ? `${dns[address]} (${address})` : `${address}`}`, censorKey: address.slice(2)
+        type: "success", description: `Your game server DNS is set to ${dns[address] ? `${dns[address]} (${address})` : `${address}`}`, censorKey: address.slice(2)
     }), {headers: {'Content-Type': 'application/json'}});
 }
 

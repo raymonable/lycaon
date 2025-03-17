@@ -77,7 +77,7 @@
     if (executables["chusanApp.exe"]) {
       patchResponses.push({
         type: "success",
-        description: `Executable ${(executables["chusanApp.exe"]).executable} is detected to be version ${executables["chusanApp.exe"].version}`
+        description: `Executable ${(executables["chusanApp.exe"]).executable.split(".")[0]} is detected to be version ${executables["chusanApp.exe"].version}.`
       })
       if (executables["amdaemon.exe"])
         patchResponses.push(getCompatibilityAmdaemon(

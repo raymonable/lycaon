@@ -28,11 +28,11 @@ export default {
 
         if (address == "127.0.0.1" || !address)
             return {
-                type: "warning", description: `You are not connecting to an ALL.net server. You may have problems with Accounting Database on first start.`
+                type: "warning", description: `You are not specifically connecting to a game server. You may have problems with Accounting Database on first start.`
             }
         else if (isIpAddress(address)) {
                 return {
-                    type: "success", description: `Your ALL.net server is set to ${address}`, censorKey: address.slice(2)
+                    type: "success", description: `Your game server DNS is set to ${address}`, censorKey: address.slice(2)
                 }
             } else if (isDomain(address))
                 return getDnsInformation(address);

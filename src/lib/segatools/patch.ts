@@ -89,11 +89,11 @@ export function getCompatibilityAmdaemon(chusan: ChusanExecutable, amdaemon: Chu
             type: "error"
         }
     const compatibleResponse: SegatoolsResponse = {
-        description: "Your amdaemon.exe is compatible with your chusanApp.exe",
+        description: "Your amdaemon is compatible with your chusanApp.",
         type: "success"
     }
     const incompatibleResponse: SegatoolsResponse = {
-        description: "Your amdaemon.exe is not compatible with your chusanApp.exe, please ensure it matches",
+        description: "Your amdaemon is not compatible with your chusanApp, please ensure it matches.",
         type: "error"
     }
 
