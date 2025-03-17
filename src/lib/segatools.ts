@@ -1,5 +1,6 @@
 import { type SegatoolsValue, expectedKeys } from "./segatools/expectedKeys";
 import { accessRelativePath, isOption } from "./segatools/fs";
+import { getExecutable, type ChusanExecutable } from "./segatools/patch";
 
 export type SegatoolsResponseType = "severe" | "error" | "warning" | "success" | "loading";
 export interface SegatoolsResponse {
@@ -14,7 +15,7 @@ export interface SegatoolsProblem {
     match: (entries: Record<string, Record<string, number | string | boolean>>) => Promise<undefined | SegatoolsResponse> // Try to return a response whenever possible.
 };
 export interface SegatoolsPathProblem {
-    match: (entries: Record<string, Record<string, number | string | boolean>>, binPath: FileSystemDirectoryEntry, scope: FileSystemDirectoryEntry) => Promise<undefined | SegatoolsResponse>
+    match: (entries: Record<string, Record<string, number | string | boolean>>, binPath: FileSystemDirectoryEntry, scope: FileSystemDirectoryEntry, chusan?: ChusanExecutable) => Promise<undefined | SegatoolsResponse>
 };
 
 const sectionRegex = /^[\[\]].*?$/;
@@ -163,13 +164,24 @@ export async function troubleshootSegatools(segatoolsString: string, binPath?: F
             responses.push(match);
     }
 
-    if (binPath && scope)
-        for (let idx = 0; paths.length > idx; idx++) {
-            let path = paths[idx];
-            let match = await path.match(segatools, binPath, scope);
-            if (match)
-                responses.push(match);
-        };
+    // this is so fucking jank i can't wait for rewrite holy shit
+    let chusanFile = await accessRelativePath(binPath, "chusanApp.exe", scope);
+    if (chusanFile) {
+        let chusanBlob = await new Promise(r => (chusanFile as FileSystemFileEntry).file(f => r(f)));
+        if (chusanBlob instanceof Blob) {
+            let executable = await getExecutable("chusanApp.exe", chusanBlob);
+            if ((executable as ChusanExecutable).executable)
+                if (binPath && scope)
+                    for (let idx = 0; paths.length > idx; idx++) {
+                        let path = paths[idx];
+                        let match = await path.match(segatools, binPath, scope, (executable as ChusanExecutable));
+                        if (match)
+                            responses.push(match);
+                    };
+        }
+    }
+
+    
     if (add)
         responses = [...responses, ...add];
 

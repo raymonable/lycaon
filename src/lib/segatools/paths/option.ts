@@ -1,10 +1,16 @@
 import { type SegatoolsPathProblem, type SegatoolsResponse, type SegatoolsResponseType } from "../../segatools";
 import { accessRelativePath, isOption } from "../fs";
 
+import opts from "$lib/config/opts.json"
+import type { ChusanExecutable } from "../patch";
+
 export default {
-    async match(entries: Record<string, Record<string, string | number | boolean>>, binPath: FileSystemDirectoryEntry, scope: FileSystemDirectoryEntry): Promise<undefined | SegatoolsResponse> {
+    async match(entries: Record<string, Record<string, string | number | boolean>>, binPath: FileSystemDirectoryEntry, scope: FileSystemDirectoryEntry, chusan: ChusanExecutable): Promise<undefined | SegatoolsResponse> {
         if (!entries["vfs"]) return;
         try {
+            const smallVersion = chusan.version.substring(0, 4);
+            const officialOptData = opts[smallVersion] ?? [];
+
             let optionInfos = []; let optionInfoType: SegatoolsResponseType = "success";
             let file = await accessRelativePath(binPath, entries["vfs"]["option"] as string) as FileSystemDirectoryEntry | undefined;
             if (file) {
@@ -23,9 +29,12 @@ export default {
                             optionInfos.push(`Option ${option.name} contains an unnecessary child folder`);
                             optionInfoType = "warning";
                         }
-                        optionNames.push(option.name);
+                        if (officialOptData.includes(option.name)) {
+                            optionNames.push(option.name); 
+                        } else
+                            optionNames.push(`${option.name}?`);
                     } else {
-                        optionInfos.push(`Non-original option ${option.name}`);
+                        optionInfos.push(`${option.name}??`);
                         optionInfoType = "warning";
                     }
                 }
