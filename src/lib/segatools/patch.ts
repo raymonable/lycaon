@@ -76,3 +76,34 @@ export async function processPatches(binary: Blob, executable: ChusanExecutable)
         })
     return executable;
 };
+export function getCompatibilityAmdaemon(chusan: ChusanExecutable, amdaemon: ChusanExecutable): SegatoolsResponse {
+    const chusanMajorVersion = parseInt(chusan.version.substring(2, 3));
+    const chusanMinorVersion = parseInt(chusan.version.substring(3, 4));
+
+    const amdaemonMajorVersion = parseInt(amdaemon.version.substring(2, 3));
+    const amdaemonMinorVersion = parseInt(amdaemon.version.substring(3, 4));
+
+    if (chusan.version.substring(0, 1) != "2")
+        return {
+            description: "You are on unsupported data.",
+            type: "error"
+        }
+    const compatibleResponse: SegatoolsResponse = {
+        description: "Your amdaemon.exe is compatible with your chusanApp.exe",
+        type: "success"
+    }
+    const incompatibleResponse: SegatoolsResponse = {
+        description: "Your amdaemon.exe is not compatible with your chusanApp.exe, please ensure it matches",
+        type: "error"
+    }
+
+   if (chusanMajorVersion == 0 && chusanMinorVersion == 0) {
+        // 2.00 specific
+        return (amdaemonMajorVersion == chusanMajorVersion && amdaemonMinorVersion == chusanMinorVersion) ? compatibleResponse : incompatibleResponse;
+   } else if (chusanMajorVersion <= 2) {
+        // 2.20 and up
+        return amdaemonMajorVersion == 2 ? compatibleResponse : incompatibleResponse;
+   }
+    // 2.05 - 2.16
+    return compatibleResponse;
+}

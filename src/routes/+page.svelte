@@ -5,7 +5,7 @@
   import Editor from "$lib/editor.svelte";
 
   import hotkeys from "hotkeys-js";
-  import { getExecutable, processPatches, type ChusanExecutable } from "$lib/segatools/patch";
+  import { getCompatibilityAmdaemon, getExecutable, processPatches, type ChusanExecutable } from "$lib/segatools/patch";
 
   type SegatoolsState = "drop" | "success";
 
@@ -52,7 +52,10 @@
     e.preventDefault(); save();
   });
 
+  // TODO: safely move to another file
   async function analyzeExecutables(binPath: FileSystemDirectoryEntry, scopePath: FileSystemDirectoryEntry) {
+    let executables: Record<string, ChusanExecutable> = {};
+    // TODO: cleanup
     for (let target of ["chusanApp.exe", "amdaemon.exe"]) {
       let location = (await accessRelativePath(binPath, target, scopePath)) as FileSystemFileEntry;
       if (!location) continue;
@@ -63,15 +66,26 @@
       let executable = await getExecutable(target, binary);
       if (executable) {
         if ((executable as ChusanExecutable).executable) {
+          // i hate type casting this is dogshit
           patches.push(executable as ChusanExecutable);
-          patchResponses.push({
-            type: "success",
-            description: `Executable ${(executable as ChusanExecutable).executable} is detected to be version ${(executable as ChusanExecutable).version}`
-          })
+          executables[(executable as ChusanExecutable).executable] = executable as ChusanExecutable;
         } else if ((executable as SegatoolsResponse).type)
           patchResponses.push(executable as SegatoolsResponse);
       }
     };
+    // thanks keeboard
+    if (executables["chusanApp.exe"]) {
+      patchResponses.push({
+        type: "success",
+        description: `Executable ${(executables["chusanApp.exe"]).executable} is detected to be version ${executables["chusanApp.exe"].version}`
+      })
+      if (executables["amdaemon.exe"])
+        patchResponses.push(getCompatibilityAmdaemon(
+          executables["chusanApp.exe"],
+          executables["amdaemon.exe"]
+        ));
+    }
+
     // should we check more than just "start.bat"??
     let location = (await accessRelativePath(binPath, "start.bat", scopePath)) as FileSystemFileEntry;
     if (location) {
