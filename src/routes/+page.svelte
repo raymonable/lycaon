@@ -154,11 +154,9 @@
   This tool is only intended for「CHUNITHM NEW!!」or newer.
   All data (besides DNS verification) is processed on the client.
 </p>
-{#if !navigator.userAgent.includes("Chrome")}
 <p>
-  <b>You are on a non-Chromium browser. You will experience issues. Please switch to a Chromium-based browser.</b>
+  <b>I am building a version 2.0 to be less CHUNITHM-specific. I do not have an ETA, so please be patient as I rework the entire codebase.</b>
 </p>
-{/if}
 {#if (state as SegatoolsState) === "success"}
   <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
   <p>
