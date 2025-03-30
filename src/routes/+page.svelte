@@ -154,9 +154,6 @@
   This tool is only intended for「CHUNITHM NEW!!」or newer.
   All data (besides DNS verification) is processed on the client.
 </p>
-<p>
-  <b>I am building a version 2.0 to be less CHUNITHM-specific. I do not have an ETA, so please be patient as I rework the entire codebase.</b>
-</p>
 {#if (state as SegatoolsState) === "success"}
   <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
   <p>
