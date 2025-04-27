@@ -123,6 +123,7 @@
       }
     // fuck you legacy apis
     if (response?.segatoolsPath instanceof File) {
+      if (!confirm("Hey, just wanted to, uh, let you know. You can drag and drop YOUR ENTIRE GAME FOLDER from file explorer onto the box. If you don't do this, a majority of the detections will not work. Honestly, you should be doing this unless there's something SERIOUSLY wrong with either you or the website. Press OK if you don't fuckin care and want me to die. Otherwise, please press cancel and fix your mistake.")) return;
       await updateSegatools(await response.segatoolsPath.text());
       state = "success";
     } else
@@ -150,10 +151,7 @@
   <i>This tool performs a surface-level diagnosis of your game data. Information may be incorrect. Use discretion.</i><br>
   Do <strong>NOT</strong> share your segatools.ini with people you do not trust, as it contains your keychip.
 </p>
-<p>
-  This tool is only intended for「CHUNITHM NEW!!」or newer.
-  All data (besides DNS verification) is processed on the client.
-</p>
+<h2>Drag and drop <i>your entire game folder</i> onto the box for all of the detections to work.</h2>
 {#if (state as SegatoolsState) === "success"}
   <Editor data={defaultSegatoolsString} {responses} {updateSegatools} />
   <p>
