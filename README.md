@@ -1,8 +1,8 @@
 # lycaon project
 
-A segatools.ini editor / checker for a specific slider-based game.
+> :warning: This project's codebase is not good and does not reflect my current TypeScript capabilities. Please forgive me.
 
-> :warning: Firefox and other non-Chromium based browsers may have issues as `webkitEntries` (yes, an old API, whatever) doesn't work as intended on Firefox.
+A segatools.ini editor / checker for a specific slider-based game.
 
 ## Features
 
