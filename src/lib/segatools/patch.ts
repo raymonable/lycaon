@@ -54,12 +54,13 @@ export async function getExecutable(name: string, binary: Blob) : Promise<Chusan
             })
     );
     if (executable) return await processPatches(binary, executable);
-    if (searchInArray(array, "KeRnEl32.dLl")) {
+    // This check is flawed and is triggered by 2.31 executables
+    /*if (searchInArray(array, "KeRnEl32.dLl")) {
         return {
             type: "error",
             description: `${name} appears to be a packed executable.`
         }
-    } else
+    } else*/
         return {
             type: "warning",
             description: `${name} is an unusual executable that isn't compatible with any patches.`
