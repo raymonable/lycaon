@@ -1,10 +1,11 @@
-# lycaon project
+## dumbassithm (lycaon)
 
-> :warning: This project's codebase is not good and does not reflect my current TypeScript capabilities. Please forgive me.
+> [!CAUTION]
+> This project is unmaintained. Executable checks, patch listings and (some) segatools checks no longer work as intended and false issues will appear. Use this tool with discretion.
 
-A segatools.ini editor / checker for a specific slider-based game.
+A segatools.ini checker for a pretty chuunibyou game.
 
-## Features
+### Features
 
 Checks:
 - All paths in segatools.ini<br>
@@ -16,7 +17,7 @@ Checks:
 
 Generally, if there are no errors mentioning it and it's shown on the list above, you can probably rule it out as being problematic.
 
-## Hosting
+### Installation & Hosting
 
 1. Clone this repository
 2. Install packages
